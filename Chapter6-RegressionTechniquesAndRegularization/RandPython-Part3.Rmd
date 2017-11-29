@@ -1,0 +1,926 @@
+---
+title: "Practical Machine Learning with R and Python - Part 3 "
+author: "Tinniam V Ganesh"
+date: "October 16, 2017"
+output: html_document
+---
+
+In this post 'Practical Machine Learning with R and Python - Part 3' I discuss 'Feature Selection' methods. This post is a continuation of my 2 earlier posts
+
+1. [Practical Machine Learning with R and Python - Part 1](https://gigadom.wordpress.com/2017/10/06/practical-machine-learning-with-r-and-python-part-1/)
+
+2. [Practical Machine Learning with R and Python - Part 1](https://gigadom.wordpress.com/2017/10/13/practical-machine-learning-with-r-and-python-part-2/)
+
+
+While applying Machine Learning techniques the data set will usually include a large number of predictors for a target variable. It is likely that not all the predictor or feature variables will have an impact on the output. Hence it is becomes necessary to choose only those features which influence the output variable thus simplying the reduced feature set on which to train the ML model on.  The techiniques that are used are the following
+
+- Best fit 
+- Forward fit 
+- Backward fit
+- Ridge Regression or L2 regularization
+- Lasso or L1 regularization
+
+All these methods remove those features which do not sufficiently influence  the output.
+
+# 1.1 Best Fit
+For a dataset with features f1,f2,f3...fn, the 'Best fit' approach, chooses all possible combinations of features and creates separate ML models for each of the different combinations. The best fit algotithm then  uses some filtering  criteria based on Adj Rsquared, Cp, BIC or AIC to pick out the best model among all models.
+
+Since the Best Fit approach searches the entire solution space it is computationally infeasible. The number of models that have to be searched increase exponentially as the number of predictors increase. For 'p' predictors a total of  latex 2^{p} ML models have to be searched. This can be shown as follows
+
+There are latex C_{1} ways to choose single feature ML models among 'n' features, latex C_{2} ways to choose 2 feature models among 'n' models and so on, or
+
+C_{1} + C_{2} +.... + C_{n}= Total number of models in Best Fit
+Since from Binomail theorem we have 
+ $(1+x)^{n} = 1+C_{1}x + C_{2} +... + C_{n}$  --- (1)
+
+When x=1 in the equation (1) above, this becomes
+2^{n} = 1+C_{1}x + C_{2} +... + C_{n}
+
+Hence there are 2^{n} models to search amongs in Best Fit. For 10 features this is  2^{10} or ~1000 models and for 40 features this becoms 2^{40} which almost 1 trillion. Usually there are datasets with 1000 or maybe even 100000 features and Best fit becomes computationally infeasible.
+
+
+Anyways I have included the Best Fit approach as I use the Boston crime datasets which is available both the MASS package in R and Sklearn in Python and it has 13 features. Even this small feature set takes a bit of time since the Best fit needs to search among ~2^{13}= 8192 models
+
+Initially I perform a simple Linear Regression Fit to estimate the features that are statistically insignificant. By looking at the p-values of the features it can be 
+seen that 'indus' and 'age' features have high p-values and are not significant
+
+# 1.1a Linear Regression - R code
+```{r fig1,cache=TRUE}
+source('RFunctions-1.R')
+#Read the Boston crime data
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+# Rename the columns
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+# Select specific columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                            "distances","highways","tax","teacherRatio","color","status","cost")
+dim(df1)
+# Linear Regression fit
+fit <- lm(cost~. ,data=df1)
+summary(fit)
+
+```
+
+Next we apply the different feature selection models to automatically remove features that are not significant below
+
+# 1.1a Best Fit - R code
+
+The Best Fit requires the 'leaps' R package
+```{r}
+library(leaps)
+source('RFunctions-1.R')
+#Read the Boston crime data
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+# Rename the columns
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+# Select specific columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                            "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Perform a best fit
+bestFit=regsubsets(cost~.,df1,nvmax=13)
+
+# Generate a summary of the fit
+bfSummary=summary(bestFit)
+
+# Plot the Residual Sum of Squares vs number of variables 
+plot(bfSummary$rss,xlab="Number of Variables",ylab="RSS",type="l",main="Best fit RSS vs No of features")
+# Get the index of the minimum value
+a=which.min(bfSummary$rss)
+# Mark this in red
+points(a,bfSummary$rss[a],col="red",cex=2,pch=20)
+
+# Plot the CP statistic vs Number of variables
+plot(bfSummary$cp,xlab="Number of Variables",ylab="Cp",type='l',main="Best fit Cp vs No of features")
+# Find the lowest CP value
+b=which.min(bfSummary$cp)
+# Mark this in red
+points(b,bfSummary$cp[b],col="red",cex=2,pch=20)
+
+
+# Display the set of features which provide the best fit
+coef(bestFit,b)
+
+#  Plot the BIC value
+plot(bfSummary$bic,xlab="Number of Variables",ylab="BIC",type='l',main="Best fit BIC vs No of Features")
+# Find and mark the min value
+c=which.min(bfSummary$bic)
+points(c,bfSummary$bic[c],col="red",cex=2,pch=20)
+
+# R has some other good plots for best fit
+plot(bestFit,scale="r2",main="Rsquared vs No Features")
+
+plot(bestFit,scale="Cp",main="Cp vs NoFeatures")
+
+plot(bestFit,scale="bic",main="BIC vs Features")
+
+```
+
+## 1.1b Best fit (Exhaustive Search ) - Python code
+The Python package for performing a Best Fit is the Exhaustive Feature Selector [EFS](http://rasbt.github.io/mlxtend/user_guide/feature_selection/ExhaustiveFeatureSelector/).
+```{python cache=TRUE,message=FALSE,warning=FALSE}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
+
+# Read the Boston crime data
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+# Set X and y 
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+
+# Perform an Exhaustive Search. The EFS and SFS packages use 'neg_mean_squared_error'. The 'mean_squared_error' seems to have been deprecated. I think this is just the MSE with the a negative sign.
+lr = LinearRegression()
+efs1 = EFS(lr, 
+           min_features=1,
+           max_features=13,
+           scoring='neg_mean_squared_error',
+           print_progress=True,
+           cv=5)
+
+
+# Create a efs fit
+efs1 = efs1.fit(X.as_matrix(), y.as_matrix())
+
+print('Best negtive mean squared error: %.2f' % efs1.best_score_)
+## Print the IDX of the best features 
+print('Best subset:', efs1.best_idx_)
+```
+
+# 1.2 Forward fit
+Forward fit is a greedy algorithm that tries to optimize the feature selected, by minimizing the selection criteria (adj Rsqaured, Cp, AIC or BIC) at every step. For a dataset with features f1,f2,f3...fn, the forward fit starts with the NULL set. It then pick the ML model with a single feature from n features  which has the highest adj Rsquared, or minimum Cp, BIC or some such criteria.  After picking the 1 feature from n which satisfies the criteria the most, the next feature from the remaining n-1 features is chosen. When the 2 feature model which satisfies the selection criteria the best is chosen, another feature from the remaining n-2 features are added and so on. The forward fit is a sub-optimal algorithm. There is no guarantee that the final list of features chosen will be the best among the lot. The computation required for this is of 
+n + n-1 + n-2 + ...1 = n(n+1)/2 which is of the order of n^{2}. Though forward fit is a sub optimal solution it is far more computationally efficient than best fit
+
+
+## 1.2a Forward fit - R code
+Forward fit in R determines that 11 features are required for the best fit. The features are shown below
+
+```{r fig2,cache=TRUE}
+library(leaps)
+# Read the data
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+# Rename the columns
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Select columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                     "distances","highways","tax","teacherRatio","color","status","cost")
+
+#Split as training and test 
+train_idx <- trainTestSplit(df1,trainPercent=75,seed=5)
+train <- df1[train_idx, ]
+test <- df1[-train_idx, ]
+
+# Find the best forward fit
+fitFwd=regsubsets(cost~.,data=train,nvmax=13,method="forward")
+
+# Compute the MSE
+valErrors=rep(NA,13)
+test.mat=model.matrix(cost~.,data=test)
+for(i in 1:13){
+    coefi=coef(fitFwd,id=i)
+    pred=test.mat[,names(coefi)]%*%coefi
+    valErrors[i]=mean((test$cost-pred)^2)
+}
+
+# Plot the Residual Sum of Squares
+plot(valErrors,xlab="Number of Variables",ylab="Validation Error",type="l",main="Forward fit RSS vs No of features")
+# Gives the index of the minimum value
+a<-which.min(valErrors)
+print(a)
+# Highlight the smallest value
+points(c,valErrors[a],col="blue",cex=2,pch=20)
+
+#Print the 11 ccoefficients
+coefi=coef(fitFwd,id=i)
+coefi
+```
+
+## 1.2b Forward fit with Cross Validation - R code
+The Python package SFS includes N Fold Cross Validation errors for forward and backward fit
+so I decided to add this code to R. This is not available in the leaps R package, however the implementation is quite simple. Another implementation is also available at [Statistical Learning](https://lagunita.stanford.edu/courses/HumanitiesandScience/StatLearning/Winter2015/about), Prof Trevor Hastie & Prof Robert Tibesherani, Online Stanford
+2. [Applied Machine Learning in Python](https://www.coursera.org/learn/python-machin
+```{r fig3,cache=TRUE}
+library(dplyr)
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Select columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                     "distances","highways","tax","teacherRatio","color","status","cost")
+
+set.seed(6)
+# Set max number of features
+nvmax<-13
+cvError <- NULL
+# Loop through each features
+for(i in 1:nvmax){
+    # Set no of folds
+    noFolds=5
+    # Create the rows which fall into different folds from 1..noFolds
+    folds = sample(1:noFolds, nrow(df1), replace=TRUE) 
+    cv<-0
+    # Loop through the folds
+    for(j in 1:noFolds){
+        # The training is all rows for which the row is != j (k-1 folds -> training)
+        train <- df1[folds!=j,]
+        # The rows which have j as the index become the test set
+        test <- df1[folds==j,]
+        # Create a forward fitting model for this
+        fitFwd=regsubsets(cost~.,data=train,nvmax=13,method="forward")
+        # Select the number of features and get the feature coefficients
+        coefi=coef(fitFwd,id=i)
+        #Get the value of the test data
+        test.mat=model.matrix(cost~.,data=test)
+        # Multiply the tes data with teh fitted coefficients to get the predicted value
+        # pred = b0 + b1x1+b2x2... b13x13
+        pred=test.mat[,names(coefi)]%*%coefi
+        # Compute mean squared error
+        rss=mean((test$cost - pred)^2)
+        # Add all the Cross Validation errors
+        cv=cv+rss
+    }
+    # Compute the average of MSE for K folds for number of features 'i'
+    cvError[i]=cv/noFolds
+}
+a <- seq(1,13)
+d <- as.data.frame(t(rbind(a,cvError)))
+names(d) <- c("Features","CVError")
+ggplot(d,aes(x=Features,y=CVError),color="blue") + geom_point() + geom_line(color="blue") +
+    xlab("No of features") + ylab("Cross Validation Error") +
+    ggtitle("Forward Selection - Cross Valdation Error vs No of Features")
+
+# This gives the index of the minimum value
+a=which.min(cvError)
+print(a)
+#Print the 13 coefficients of these features
+coefi=coef(fitFwd,id=a)
+coefi
+
+
+```
+
+## 1.2b Forward fit - Python code
+The Backward Fit in Python uses the  Sequential feature selection (SFS) package (SFS)(https://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/)
+**Note:** The Cross validation error for SFS in Sklearn is negative, possibly because it computes
+the 'neg_mean_squared_error'. The earlier 'mean_squared_error' in the package seems to have been deprecated.  I have taken the -ve of this neg_mean_squared_error. I think this
+would give mean_squared_error.
+```{python }
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_boston
+from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+import matplotlib.pyplot as plt
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
+
+
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+lr = LinearRegression()
+# Create a forward fit model
+sfs = SFS(lr, 
+          k_features=(1,13), 
+          forward=True, # Forward fit
+          floating=False, 
+          scoring='neg_mean_squared_error',
+          cv=5)
+
+# Fit this on the data
+sfs = sfs.fit(X.as_matrix(), y.as_matrix())
+# Get all the details of the forward fits
+a=sfs.get_metric_dict()
+n=[]
+o=[]
+
+# Compute the mean cross validation scores
+for i in np.arange(1,13):
+    n.append(-np.mean(a[i]['cv_scores'])) 
+   
+    
+    
+m=np.arange(1,13)
+# Get the index of the minimum CV score
+
+# Plot the CV scores vs the number of features
+fig1=plt.plot(m,n)
+fig1=plt.title('Mean CV Scores vs No of features')
+fig1.figure.savefig('fig1.png', bbox_inches='tight')
+
+print(pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.90)).T)
+
+idx = np.argmin(n)
+print "No of features=",idx
+#Get the features indices for the best forward fit and convert to list
+b=list(a[idx]['feature_idx'])
+print(b)
+
+print("#################################################################################")
+# Index the column names. 
+# Features from forward fit
+print("Features selected in forward fit")
+print(X.columns[b])
+```
+
+
+![output](fig1.png)
+
+## 1.3 Backward Fit
+Backward fit belongs to the class of greedy algorithms which  tries to optimize the feature set, by dropping a feature at every stage which results in the worst performance for a given criteria of Adj RSquared, Cp, BIC or AIC.  For a dataset with features f1,f2,f3...fn, the backward fit starts with the all the features f1,f2.. fn to begin with. It then pick the ML model with a n-1 features  by dropping the feature,f_{j}, for e.g., the inclusion of which results in the worst performance in adj Rsquared, or minimum Cp, BIC or some such criteria.  At every step 1 feature is dopped. There is no guarantee that the final list of features chosen will be the best among the lot. The computation required for this is of 
+n + n-1 + n -2 + .. 1 = n(n+1)/2 which is of the order of n^{2}. Though backward fit is a sub optimal solution it is far more computationally efficient than best fit
+
+## 1.3a Backward fit - R code
+```{r fig4,cache=TRUE}
+library(dplyr)
+# Read the data
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+# Rename the columns
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Select columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                     "distances","highways","tax","teacherRatio","color","status","cost")
+
+set.seed(6)
+# Set max number of features
+nvmax<-13
+cvError <- NULL
+# Loop through each features
+for(i in 1:nvmax){
+    # Set no of folds
+    noFolds=5
+    # Create the rows which fall into different folds from 1..noFolds
+    folds = sample(1:noFolds, nrow(df1), replace=TRUE) 
+    cv<-0
+    for(j in 1:noFolds){
+        # The training is all rows for which the row is != j 
+        train <- df1[folds!=j,]
+        # The rows which have j as the index become the test set
+        test <- df1[folds==j,]
+        # Create a backward fitting model for this
+        fitFwd=regsubsets(cost~.,data=train,nvmax=13,method="backward")
+        # Select the number of features and get the feature coefficients
+        coefi=coef(fitFwd,id=i)
+        #Get the value of the test data
+        test.mat=model.matrix(cost~.,data=test)
+        # Multiply the tes data with teh fitted coefficients to get the predicted value
+        # pred = b0 + b1x1+b2x2... b13x13
+        pred=test.mat[,names(coefi)]%*%coefi
+        # Compute mean squared error
+        rss=mean((test$cost - pred)^2)
+        # Add the Residual sum of square
+        cv=cv+rss
+    }
+    # Compute the average of MSE for K folds for number of features 'i'
+    cvError[i]=cv/noFolds
+}
+a <- seq(1,13)
+d <- as.data.frame(t(rbind(a,cvError)))
+names(d) <- c("Features","CVError")
+# Plot the Cross Validation Error vs Number of features
+ggplot(d,aes(x=Features,y=CVError),color="blue") + geom_point() + geom_line(color="blue") +
+    xlab("No of features") + ylab("Cross Validation Error") +
+    ggtitle("Backward Selection - Cross Valdation Error vs No of Features")
+
+# This gives the index of the minimum value
+a=which.min(cvError)
+print(a)
+#Print the 13 coefficients of these features
+coefi=coef(fitFwd,id=a)
+coefi
+
+```
+
+
+## 1.3b Backward fit - Python code
+The Backward Fit in Python uses the  Sequential feature selection (SFS)  package (SFS)(https://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/)
+```{python }
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+import matplotlib.pyplot as plt
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
+
+# Read the data
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+lr = LinearRegression()
+
+# Create the SFS model
+sfs = SFS(lr, 
+          k_features=(1,13), 
+          forward=False, # Backward
+          floating=False, 
+          scoring='neg_mean_squared_error',
+          cv=5)
+
+# Fit the model
+sfs = sfs.fit(X.as_matrix(), y.as_matrix())
+a=sfs.get_metric_dict()
+n=[]
+o=[]
+
+# Compute the mean of the validation scores
+for i in np.arange(1,13):
+    n.append(-np.mean(a[i]['cv_scores'])) 
+   
+    
+    
+m=np.arange(1,13)
+
+# Plot the Validation scores vs number of features
+fig2=plt.plot(m,n)
+fig2=plt.title('Mean CV Scores vs No of features')
+fig2.figure.savefig('fig2.png', bbox_inches='tight')
+
+print(pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.90)).T)
+
+# Get the index of minimum cross validation error
+idx = np.argmin(n)
+print "No of features=",idx
+#Get the features indices for the best forward fit and convert to list
+b=list(a[idx]['feature_idx'])
+# Index the column names. 
+# Features from backward fit
+print("Features selected in bacward fit")
+print(X.columns[b])
+
+
+```
+
+![output](fig2.png)
+
+
+## 1.3c Sequential Floating Forward Selection (SFFS) - Python code
+The Sequential Feature search also includes 'floating' variants which include or exclude features conditionally, once they were excluded or included. The SFFS can conditionally include features which were excluded from the previous step, if it results in a better fit. This option will tend to a better solution, than plain simple SFS. These variants are included below
+```{python }
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_boston
+from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+import matplotlib.pyplot as plt
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
+
+
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+lr = LinearRegression()
+
+# Create the floating forward search
+sffs = SFS(lr, 
+          k_features=(1,13), 
+          forward=True,  # Forward
+          floating=True,  #Floating
+          scoring='neg_mean_squared_error',
+          cv=5)
+
+# Fit a model
+sffs = sffs.fit(X.as_matrix(), y.as_matrix())
+a=sffs.get_metric_dict()
+n=[]
+o=[]
+# Compute mean validation scores
+for i in np.arange(1,13):
+    n.append(-np.mean(a[i]['cv_scores'])) 
+   
+    
+    
+m=np.arange(1,13)
+
+
+# Plot the cross validation score vs number of features
+fig3=plt.plot(m,n)
+fig3=plt.title('SFFS:Mean CV Scores vs No of features')
+fig3.figure.savefig('fig3.png', bbox_inches='tight')
+
+print(pd.DataFrame.from_dict(sffs.get_metric_dict(confidence_interval=0.90)).T)
+# Get the index of the minimum CV score
+idx = np.argmin(n)
+print "No of features=",idx
+#Get the features indices for the best forward floating fit and convert to list
+b=list(a[idx]['feature_idx'])
+print(b)
+
+print("#################################################################################")
+# Index the column names. 
+# Features from forward fit
+print("Features selected in forward fit")
+print(X.columns[b])
+```
+
+![output](fig3.png)
+
+## 1.3d Sequential Floating Backward Selection (SFBS) - Python code
+The SFBS is an extension of the SBS. Here features that are excluded at any stage can be conditionally included if the resulting feature set gives a better fit.
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_boston
+from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+import matplotlib.pyplot as plt
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from sklearn.linear_model import LinearRegression
+
+
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+lr = LinearRegression()
+
+sffs = SFS(lr, 
+          k_features=(1,13), 
+          forward=False, # Backward
+          floating=True, # Floating
+          scoring='neg_mean_squared_error',
+          cv=5)
+
+sffs = sffs.fit(X.as_matrix(), y.as_matrix())
+a=sffs.get_metric_dict()
+n=[]
+o=[]
+# Compute the mean cross validation score
+for i in np.arange(1,13):
+    n.append(-np.mean(a[i]['cv_scores'])) 
+   
+    
+    
+m=np.arange(1,13)
+
+fig4=plt.plot(m,n)
+fig4=plt.title('SFBS: Mean CV Scores vs No of features')
+fig4.figure.savefig('fig4.png', bbox_inches='tight')
+
+print(pd.DataFrame.from_dict(sffs.get_metric_dict(confidence_interval=0.90)).T)
+
+# Get the index of the minimum CV score
+idx = np.argmin(n)
+print "No of features=",idx
+#Get the features indices for the best backward floating fit and convert to list
+b=list(a[idx]['feature_idx'])
+print(b)
+
+print("#################################################################################")
+# Index the column names. 
+# Features from forward fit
+print("Features selected in backward floating fit")
+print(X.columns[b])
+```
+
+![output](fig4.png)
+
+# 1.4 Ridge regression
+In Linear Regression the Residual Sum of Squares (RSS) is given as
+RSS = \sum_{i=1}^{n} (y_{i} - \beta_{0} - \sum_{j=1}^{p}\beta_jx_{ij})^{2}
+\sum_{i=1}^{n} (y_{i} - \beta_{0} - \sum_{j=1}^{p}\beta_jx_{ij})^{2} + \lambda \sum_{j=1}^{p}\beta^{2}
+
+where \lambda  is the regularization or tuning parameter. Increasing \lambda increases the penalty on the coefficients thus shrinking them. However in Ridge Regression features that do not influence the target variable will shrink closer to zero but never become zero except for very large values of \lambda
+
+Ridge regression in R requires the 'glmnet' package
+
+## 1.4a Ridge Regression - R code
+```{r}
+library(glmnet)
+library(dplyr)
+# Read the data
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+#Rename the columns
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+# Select specific columns
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                            "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Set X and y as matrices
+X=as.matrix(df1[,1:13])
+y=df1$cost
+
+# Fit a Ridge model
+fitRidge <-glmnet(X,y,alpha=0)
+
+#Plot the model where the coefficient shrinkage is plotted vs log lambda
+plot(fitRidge,xvar="lambda",label=TRUE,main= "Ridge regression coefficient shrikage vs log lambda")
+
+# Compute the cross validation error
+cvRidge=cv.glmnet(X,y,alpha=0)
+
+#Plot the cross validation error
+plot(cvRidge, main="Ridge regression Cross Validation Error (10 fold)")
+
+```
+
+## 1.4a Ridge Regression - Python code
+The coefficient shrinkage for Python can be plotted like R using Least Angle Regression model a.k.a. LARS package. This is included below
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+
+from sklearn.linear_model import Ridge
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                   random_state = 0)
+
+# Scale the X_train and X_test
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Fit a ridge regression with alpha=20
+linridge = Ridge(alpha=20.0).fit(X_train_scaled, y_train)
+
+# Print the training R squared
+print('R-squared score (training): {:.3f}'
+     .format(linridge.score(X_train_scaled, y_train)))
+# Print the test Rsquared
+print('R-squared score (test): {:.3f}'
+     .format(linridge.score(X_test_scaled, y_test)))
+print('Number of non-zero features: {}'
+     .format(np.sum(linridge.coef_ != 0)))
+
+trainingRsquared=[]
+testRsquared=[]
+# Plot the effect of alpha on the test Rsquared
+print('Ridge regression: effect of alpha regularization parameter\n')
+# Choose a list of alpha values
+for this_alpha in [0.001,.01,.1,0, 1, 10, 20, 50, 100, 1000]:
+    linridge = Ridge(alpha = this_alpha).fit(X_train_scaled, y_train)
+    # Compute training rsquared
+    r2_train = linridge.score(X_train_scaled, y_train)
+    # Compute test rsqaured
+    r2_test = linridge.score(X_test_scaled, y_test)
+    num_coeff_bigger = np.sum(abs(linridge.coef_) > 1.0)
+    trainingRsquared.append(r2_train)
+    testRsquared.append(r2_test)
+    
+# Create a dataframe
+alpha=[0.001,.01,.1,0, 1, 10, 20, 50, 100, 1000]    
+trainingRsquared=pd.DataFrame(trainingRsquared,index=alpha)
+testRsquared=pd.DataFrame(testRsquared,index=alpha)
+
+# Plot training and test R squared as a function of alpha
+df3=pd.concat([trainingRsquared,testRsquared],axis=1)
+df3.columns=['trainingRsquared','testRsquared']
+
+fig5=df3.plot()
+fig5=plt.title('Ridge training and test squared error vs Alpha')
+fig5.figure.savefig('fig5.png', bbox_inches='tight')
+
+# Plot the coefficient shrinage using the LARS package
+
+from sklearn import linear_model
+# #############################################################################
+# Compute paths
+
+n_alphas = 200
+alphas = np.logspace(0, 8, n_alphas)
+
+coefs = []
+for a in alphas:
+    ridge = linear_model.Ridge(alpha=a, fit_intercept=False)
+    ridge.fit(X_train_scaled, y_train)
+    coefs.append(ridge.coef_)
+
+# #############################################################################
+# Display results
+
+ax = plt.gca()
+
+fig6=ax.plot(alphas, coefs)
+fig6=ax.set_xscale('log')
+fig6=ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis
+fig6=plt.xlabel('alpha')
+fig6=plt.ylabel('weights')
+fig6=plt.title('Ridge coefficients as a function of the regularization')
+fig6=plt.axis('tight')
+plt.savefig('fig6.png', bbox_inches='tight')
+
+
+```
+
+![output](fig5.png)
+![output](fig6.png)
+# 1.5 Lasso 
+The Lasso is another form of regularization, also known as L1 regularization. Unlike the Ridge Regression where the coefficients of features which do not influence the target tend to zero, in the lasso regualrization the coefficients become 0. The general form of Lasso is as follows
+\sum_{i=1}^{n} (y_{i} - \beta_{0} - \sum_{j=1}^{p}\beta_jx_{ij})^{2} + \lambda \sum_{j=1}^{p}|\beta|\\
+
+
+## 1.5 a Lasso regularization - R code
+```{r}
+library(glmnet)
+library(dplyr)
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+names(df) <-c("no","crimeRate","zone","indus","charles","nox","rooms","age",
+              "distances","highways","tax","teacherRatio","color","status","cost")
+df1 <- df %>% dplyr::select("crimeRate","zone","indus","charles","nox","rooms","age",
+                            "distances","highways","tax","teacherRatio","color","status","cost")
+
+# Set X and y as matrices
+X=as.matrix(df1[,1:13])
+y=df1$cost
+
+# Fit the lasso model
+fitLasso <- glmnet(X,y)
+# Plot the coefficient shrinkage as a function of log(lambda)
+plot(fitLasso,xvar="lambda",label=TRUE,main="Lasso regularization - Coefficient shrinkage vs log lambda")
+
+# Compute the cross validation error (10 fold)
+cvLasso=cv.glmnet(X,y,alpha=0)
+# Plot the cross validation error
+plot(cvLasso)
+```
+
+
+## 1.5 b Lasso regularization - Python code
+
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Lasso
+from sklearn.preprocessing import MinMaxScaler
+from sklearn import linear_model
+
+scaler = MinMaxScaler()
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                   random_state = 0)
+
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+linlasso = Lasso(alpha=0.1, max_iter = 10).fit(X_train_scaled, y_train)
+
+print('Non-zero features: {}'
+     .format(np.sum(linlasso.coef_ != 0)))
+print('R-squared score (training): {:.3f}'
+     .format(linlasso.score(X_train_scaled, y_train)))
+print('R-squared score (test): {:.3f}\n'
+     .format(linlasso.score(X_test_scaled, y_test)))
+print('Features with non-zero weight (sorted by absolute magnitude):')
+
+for e in sorted (list(zip(list(X), linlasso.coef_)),
+                key = lambda e: -abs(e[1])):
+    if e[1] != 0:
+        print('\t{}, {:.3f}'.format(e[0], e[1]))
+        
+
+print('Lasso regression: effect of alpha regularization\n\
+parameter on number of features kept in final model\n')
+
+trainingRsquared=[]
+testRsquared=[]
+#for alpha in [0.01,0.05,0.1, 1, 2, 3, 5, 10, 20, 50]:
+for alpha in [0.01,0.07,0.05, 0.1, 1,2, 3, 5, 10]:
+    linlasso = Lasso(alpha, max_iter = 10000).fit(X_train_scaled, y_train)
+    r2_train = linlasso.score(X_train_scaled, y_train)
+    r2_test = linlasso.score(X_test_scaled, y_test)
+    trainingRsquared.append(r2_train)
+    testRsquared.append(r2_test)
+    
+alpha=[0.01,0.07,0.05, 0.1, 1,2, 3, 5, 10]    
+#alpha=[0.01,0.05,0.1, 1, 2, 3, 5, 10, 20, 50]
+trainingRsquared=pd.DataFrame(trainingRsquared,index=alpha)
+testRsquared=pd.DataFrame(testRsquared,index=alpha)
+
+df3=pd.concat([trainingRsquared,testRsquared],axis=1)
+df3.columns=['trainingRsquared','testRsquared']
+
+fig7=df3.plot()
+fig7=plt.title('LASSO training and test squared error vs Alpha')
+fig7.figure.savefig('fig7.png', bbox_inches='tight')
+
+
+print("Computing regularization path using the LARS ...")
+alphas, _, coefs = linear_model.lars_path(X_train_scaled, y_train, method='lasso', verbose=True)
+
+xx = np.sum(np.abs(coefs.T), axis=1)
+xx /= xx[-1]
+
+fig8=plt.plot(xx, coefs.T)
+
+fig8=ymin, ymax = plt.ylim()
+fig8=plt.vlines(xx, ymin, ymax, linestyle='dashed')
+fig8=plt.xlabel('|coef| / max|coef|')
+fig8=plt.ylabel('Coefficients')
+fig8=plt.title('LASSO Path')
+fig8=plt.axis('tight')
+plt.savefig('fig8.png', bbox_inches='tight')
+```
+
+![output](fig7.png)
+
+## 1.5c Lasso coefficient shrinkage - Python code
+To plot the coefficient shrinkage for Lasso the Least Angle Regression model a.k.a. LARS package. This is shown below
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Lasso
+from sklearn.preprocessing import MinMaxScaler
+from sklearn import linear_model
+scaler = MinMaxScaler()
+df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+#Rename the columns
+df.columns=["no","crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status","cost"]
+X=df[["crimeRate","zone","indus","chasRiver","NO2","rooms","age",
+              "distances","idxHighways","taxRate","teacherRatio","color","status"]]
+y=df['cost']
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                   random_state = 0)
+
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+
+print("Computing regularization path using the LARS ...")
+alphas, _, coefs = linear_model.lars_path(X_train_scaled, y_train, method='lasso', verbose=True)
+
+xx = np.sum(np.abs(coefs.T), axis=1)
+xx /= xx[-1]
+
+fig8=plt.plot(xx, coefs.T)
+
+ymin, ymax = plt.ylim()
+fig8=plt.vlines(xx, ymin, ymax, linestyle='dashed')
+fig8=plt.xlabel('|coef| / max|coef|')
+fig8=plt.ylabel('Coefficients')
+fig8=plt.title('LASSO Path - Coefficient Shrinkage vs L1')
+fig8=plt.axis('tight')
+plt.savefig('fig8.png', bbox_inches='tight')
+
+```
+
+![output](fig8.png)

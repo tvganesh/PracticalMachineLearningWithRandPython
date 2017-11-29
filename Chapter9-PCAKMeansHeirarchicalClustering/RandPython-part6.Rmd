@@ -1,0 +1,289 @@
+---
+title: "RandPython-Part6"
+author: "Tinniam V Ganesh"
+date: "November 20, 2017"
+output: html_document
+---
+
+# **Introduction**
+This is the final and concluding part of my series on 'Practical Machine Learning with
+R and Python'. In this series I  included the implementations of the most common
+Machine Learning algorithms in R and Python. The algorithms implemented were
+ 
+
+1. [Practical Machine Learning with R and Python - Part 1](https://gigadom.wordpress.com/2017/10/06/practical-machine-learning-with-r-and-python-part-1/)
+In this initial post, I touch upon regression of a continuous target variable. Specifically I touch upon Univariate, Multivariate, Polynomial regression and KNN regression in both R and Python
+2. [Practical Machine Learning with R and Python - Part 2](https://gigadom.wordpress.com/2017/10/13/practical-machine-learning-with-r-and-python-part-2/)
+In this post, I discuss Logistic Regression, KNN classification and Cross Validation error for both LOOCV and K-Fold in both R and Python 
+3. [Practical Machine Learning with R and Python - Part 3](https://gigadom.wordpress.com/2017/10/20/practical-machine-learning-with-r-and-python-part-3/)
+This 3rd part included 'feature selection' in Machine Learning. Specifically I touch best fit, forward fit, backward fit, ridge(L2 regularization) & lasso (L1 regularization). The post includes equivalent code in R and Python. 
+4. [Practical Machine Learning with R and Python - Part 4](https://gigadom.wordpress.com/2017/10/29/practical-machine-learning-with-r-and-python-part-4/)
+In this part I discussed SVMs, Decision Trees, Validation, Precision-Recall, AUC and  ROC curves
+5. [Practical Machine Learning with R and Python - Part 5](https://gigadom.wordpress.com/2017/11/07/practical-machine-learning-with-r-and-python-part-5/)
+In this penultimate part I touch upon B-splines, natural splines, smoothing spline,
+Generalized Additive Models(GAMs), Decision Trees, Random Forests and Gradient Boosted Trees.
+
+In this last part I cover Unsupervised Learning. Specifically I cover the implementations
+of Principal Component Analysis (PCA). K-Means and Heirachical Clustering
+
+## 1.1a Principal Component Analysis (PCA) - R code 
+ Principal Component Analysis is used to reduce the dimensionality of the input. In the code
+ below 8 x 8 pixel of handwritten digits is reduced into its principal components.
+ Then a scatter plot of the first 2 principal components give a very good visial
+ representation of the data
+ 
+```{r fig1,cache=TRUE}
+library(dplyr)
+library(ggplot2)
+#Note: This example is adapted from an the example in the book Python Datascience handbook by 
+# Jake VanderPlas (https://jakevdp.github.io/PythonDataScienceHandbook/05.09-principal-component-analysis.html)
+
+# Read the digits data (From sklearn datasets)
+digits= read.csv("digits.csv")
+# Create a digits classes target variable
+digitClasses <- factor(digits$X0.000000000000000000e.00.29)
+
+#Invoke the Principal Componsent analysis on columns 1-64
+digitsPCA=prcomp(digits[,1:64])
+
+# Create a dataframe of PCA
+df <- data.frame(digitsPCA$x)
+# Bind the digit classes
+df1 <- cbind(df,digitClasses)
+# Plot only the first 2 Principal components as a scatter plot. This plot uses only the
+# first 2 principal components 
+ggplot(df1,aes(x=PC1,y=PC2,col=digitClasses)) + geom_point() +
+  ggtitle("Top 2 Principal Components")
+
+
+```
+
+## 1.1 b Plot the variance explained as function of principal components - R code
+```{r fig2,cache=TRUE}
+# Read the digits data (from sklearn datasets)
+digits= read.csv("digits.csv")
+# Digits target
+digitClasses <- factor(digits$X0.000000000000000000e.00.29)
+digitsPCA=prcomp(digits[,1:64])
+
+
+# Get the Standard Deviation
+digitsPCA$sdev
+# Compute the variance
+digitsVar=digitsPCA$sdev^2
+#Compute the percent variance explained
+percentVarExp=digitsVar/sum(digitsVar)
+
+# Plot the percent variance exlained as a function of the  number of principal components
+plot(cumsum(percentVarExp), xlab="Principal Component", 
+     ylab="Cumulative Proportion of Variance Explained", 
+     main="Principal Components vs % Variance explained",ylim=c(0,1),type='l',lwd=2,
+       col="blue")
+```
+
+
+## 1.1c Principal Component Analysis (PCA) - Python code
+```{python}
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn import decomposition
+from sklearn import datasets
+import matplotlib.pyplot as plt
+  
+from sklearn.datasets import load_digits
+# Load the digits data
+digits = load_digits()
+# Select only the first 2 principal components
+pca = PCA(2)  # project from 64 to 2 dimensions
+#Compute the first 2 PCA
+projected = pca.fit_transform(digits.data)
+
+# Plot a scatter plot of the first 2 principal components
+plt.scatter(projected[:, 0], projected[:, 1],
+            c=digits.target, edgecolor='none', alpha=0.5,
+            cmap=plt.cm.get_cmap('spectral', 10))
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+plt.colorbar();
+plt.title("Top 2 Principal Components")
+plt.savefig('fig1.png', bbox_inches='tight')
+```
+
+## 1.1 b Plot the variance explained as function of principal components - Python code
+```{python}
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn import decomposition
+from sklearn import datasets
+import matplotlib.pyplot as plt
+  
+from sklearn.datasets import load_digits
+digits = load_digits()
+# Select all 64 principal components
+pca = PCA(64)  # project from 64 to 2 dimensions
+projected = pca.fit_transform(digits.data)
+
+# Obtain the explained variance for each principal component
+varianceExp= pca.explained_variance_ratio_
+# Compute the total sum of variance
+totVarExp=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=4)*100)
+
+# Plot the variance explained as a function of the number of principal components
+plt.plot(totVarExp)
+plt.xlabel('No of principal components')
+plt.ylabel('% variance explained')
+plt.title('No of Principal Components vs Total Variance explained')
+plt.savefig('fig2.png', bbox_inches='tight')
+```
+
+
+
+## 1.2a K-Means - R code
+In the code first the scatter plot of the first 2 Principal Components of the handwritten digits is plotted as a scatter plot. Over this plot 10 centroids of the 10 different clusters
+corresponding the 10 diferent digits is plotted over the original scatter plot.
+
+```{r fig3,cache=TRUE}
+library(ggplot2)
+# Read the digits data
+digits= read.csv("digits.csv")
+# Create digit classes target variable
+digitClasses <- factor(digits$X0.000000000000000000e.00.29)
+
+# Compute the Principal COmponents
+digitsPCA=prcomp(digits[,1:64])
+
+# Create a data frame of Principal components and the digit classes 
+df <- data.frame(digitsPCA$x)
+df1 <- cbind(df,digitClasses)
+
+# Pick only the first 2 principal components
+a<- df[,1:2]
+# Compute K Means of 10 clusters and allow for 1000 iterations
+k<-kmeans(a,10,1000)
+
+# Create a dataframe of the centroids of the clusters
+df2<-data.frame(k$centers)
+
+#Plot the first 2 principal components with the K Means centroids
+ggplot(df1,aes(x=PC1,y=PC2,col=digitClasses)) + geom_point() +
+    geom_point(data=df2,aes(x=PC1,y=PC2),col="black",size = 4) + 
+    ggtitle("Top 2 Principal Components with KMeans clustering") 
+```
+
+## 1.2b K-Means - Python code
+The centroids of the 10 different handwritten digits is plotted over the scatter plot of 
+the first 2 principal components.
+
+```{python}
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn import decomposition
+from sklearn import datasets
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.cluster import KMeans
+digits = load_digits()
+
+# Select only the 1st 2 principal components
+pca = PCA(2)  # project from 64 to 2 dimensions
+projected = pca.fit_transform(digits.data)
+
+# Create 10 different clusters
+kmeans = KMeans(n_clusters=10)
+
+# Compute  the clusters
+kmeans.fit(projected)
+y_kmeans = kmeans.predict(projected)
+# Get the cluster centroids
+centers = kmeans.cluster_centers_
+centers
+
+#Create a scatter plot of the first 2 principal components
+plt.scatter(projected[:, 0], projected[:, 1],
+            c=digits.target, edgecolor='none', alpha=0.5,
+            cmap=plt.cm.get_cmap('spectral', 10))
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+plt.colorbar();
+# Overlay the centroids on the scatter plot
+plt.scatter(centers[:, 0], centers[:, 1], c='darkblue', s=100)
+plt.savefig('fig3.png', bbox_inches='tight')
+```
+
+
+
+## 1.3a Heirarchical clusters - R code
+Herirachical clusters is another type of unsupervised learning. It successively joins the 
+closest pair of objects (points or clusters) in succession based on some 'distance' metric.
+In this type of clustering we do not have choose the number of centroids. We can cut the created dendrogram  mat an appropriate height to get a desired and reasonable number of clusters
+These are the following 'distance' metrics used while combining successive objects
+
+- Ward
+- Complete
+- Single
+- Average
+- Centroid
+
+```{r fig4,cache=TRUE}
+# Read the IRIS dataset
+iris <- datasets::iris
+iris2 <- iris[,-5]
+species <- iris[,5]
+
+#Compute the distance matrix
+d_iris <- dist(iris2) 
+
+# Use the 'average' method to for the clsuters
+hc_iris <- hclust(d_iris, method = "average")
+
+# Plot the clusters
+plot(hc_iris)
+
+# Cut tree into 3 groups
+sub_grp <- cutree(hc_iris, k = 3)
+
+# Number of members in each cluster
+table(sub_grp)
+# Draw rectangles around the clusters
+rect.hclust(hc_iris, k = 3, border = 2:5)
+
+```
+
+
+## 1.3a Heirarchical clusters - Python code
+
+```{python}
+from sklearn.datasets import load_iris
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage
+# Load the IRIS data set
+iris = load_iris()
+
+
+# Generate the linkage matrix using the average method
+Z = linkage(iris.data, 'average')
+
+#Plot the dendrogram
+dendrogram(Z)
+plt.xlabel('Data')
+plt.ylabel('Distance')
+plt.suptitle('Samples clustering', fontweight='bold', fontsize=14);
+plt.savefig('fig4.png', bbox_inches='tight')
+```
+
+
+
+# Conclusion
+This is the last and concluding part of my series on Practical Machine Learning with R and Python. These parallel implementations of R and Python can be used as a quick  reference while
+working on a large project. A person who is adept in one of the languages R or Python,
+can quickly absorb code in the other language.
+
+Hope you find this series useful!
+
+More interesting things to come. Watch this space!
+
+
+**References**
+
+1. [Statistical Learning](https://lagunita.stanford.edu/courses/HumanitiesandScience/StatLearning/Winter2015/about), Prof Trevor Hastie & Prof Robert Tibesherani, Online Stanford
+2. [Applied Machine Learning in Python](https://www.coursera.org/learn/python-machine-learning) Prof Kevyn-Collin Thomson, University Of Michigan, Coursera

@@ -1,0 +1,767 @@
+---
+title: "EssentiallPython.Rmd"
+author: "Tinniam V Ganesh"
+date: "November 22, 2017"
+output: html_document
+---
+##Introduction
+To  get started in Python, I would suggest that you install [Anaconda](https://www.anaconda.com/download/). Anaconda installs most the necessary packages for you to get started off. You can use either Jupyter notebook or the Spyder IDE
+for Python development
+
+
+This chapter focuses on some of the most Essential Python constructs that you will
+tend to use very often while performing data analysis. While Python for Datascience 
+has several complex statements this chapter distils some of the most commonly used statements. If you become adept in these you can slowly build your Python vocabulary as you become more and more conversant with the language
+
+## 1.1 Basic directory operations
+```{python}
+#To perform file or directory operation import the 'os' module
+import os
+# Change to a specific directory
+os.chdir("C:\\software\\RandPythonBook\\EssentialR\\EssentialR-master")
+
+# Get current working directory
+dir=os.getcwd()
+print(dir)
+```
+
+```{python}
+import os
+# List all files in a directory
+files=os.listdir("C:\\software\\RandPythonBook\\EssentialR\\EssentialR-master")
+print(files)
+```
+
+## 1.2. Tuples, lists and dictionaries
+The 3 basic data types in Python are
+ 
+- Tuples
+- List
+- Dictionary
+
+**Tuples**: Tuples are immutable python objects which are enclosed with paranthesis. Immutability implies that objects cannot be added or removed to tuples. Hence we cannot
+add or remove elements from tuples. However a tuple can be removed using the del() commands
+
+**List**: Lista are a sequence of disimilar objects enclosed within square brackets. Objects
+can be added to lists using append() and deleted using remove()
+
+**Dictionary**: Dictionaries are a name(key)-value pair enclosed within curly braces. The name- value pairs are separated using a ':'. The keys must be  unique in the dictionary
+
+The length of tuples, lists and dictionaries can be obtained with the len()
+# Tuples are enclosed in paranthesis
+```{python}
+mytuple=(1,3,7,6,"test")
+print(mytuple)
+
+# Lists are enclosed in square bracket
+mylist = [1, 2, 7, 4, 12 ]
+
+#Dictionary - These are similar to name-value pairs
+mydict={'Name':'Ganesh','Age':54,'Occupation':'Engineer'}
+print(mydict)
+print(mydict['Age'])
+
+# No of elements in tuples, lists and dictionaries can be got with len()
+print("Length of tuple=",len(mytuple))
+print("Length of list =", len(mylist))
+print("Length of dictionary =",len(mydict))
+```
+
+
+## 1.3. Accessing elements in tuples, lists and dictionaries
+To access elements in tuples,lists and dictionaries use an index. Indices
+in tuples, lists and dictionaries start at 0.
+
+###1.3.1 Accessing tuples
+```{python}
+# Accessing tuples
+mytuple=(1,3,7,6,"test")
+mytuple[0]
+#Slices 2nd upto 4th
+print(mytuple[2:4])
+```
+
+###1.3.2 Accessing lists
+```{python}
+# Accessing Lists
+mylist = [1, 2, 7, 4, 12 ]
+# Add an object to a list
+mylist.append(20)
+print(mylist)
+# Print 3rd element . Index starts from 0
+print(mylist[2])
+# Print a slice from the 4th to 6th
+print(mylist[3:6])
+#Print the 2nd last object
+print(mylist[-2])
+print(mylist[-5:-2])
+```
+
+
+
+###1.3.3 Accessing dictionaries
+```{python}
+# Accessing Dictionaries
+mydict={'Name':'Ganesh','Age':54,'Occupation':'Engineer','Education':'Masters'}
+#Print all objects of mydict
+print(mydict.items())
+# Print the keys
+print(mydict.keys())
+#Print the value with key 'Age'
+print(mydict['Age'])
+```
+
+##1.4. Type of a variable
+To check a variable type use type() 
+
+```{python}
+
+#Create a real valued variable
+a=5.4
+# Print the type of 'a'
+print(type(a))
+# Create a string variable
+b='A string'
+# Print the type of b
+print(type(b))
+# Create a tuple
+mytuple=(1,3,7,6,"test")
+# Print the type of mytuple
+print(type(mytuple))
+#Create list
+mylist = [1, 2, 7, 4, 12 ]
+# Print the type of list 
+print(type(mylist))
+#Create mydict
+mydict={'Name':'Ganesh','Age':54,'Occupation':'Engineer'}
+# Print type
+print(type(mydict))
+```
+
+## 1.5. Accessing help
+To get help on any python command use help()
+
+```{python}
+#Help
+import pandas as pd
+help(len)
+
+#help(dict)
+```
+
+
+
+## 1.6.  Numpy
+NumPy is one of the most fundamental package for scientific computing with Python. Numpy includes the  support for handling large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
+
+```{python}
+import numpy as np
+#Create a 1d numpy array
+data1 = [6, 7.5, 8, 0, 1]
+arr1 = np.array(data1)
+print(arr1)
+```
+
+### 1.6.1 1D array
+```{python}
+#Create numpy array in a single line
+import numpy as np
+arr1= np.array([6, 7.5, 8, 0, 1])
+#Print the array
+print(arr1)
+
+```
+
+### 1.6.2 2D array
+```{python}
+#Create a 2d numpy array
+import numpy as np
+data2 = [[1, 2, 3, 4], [5, 6, 7, 8]]
+arr2 = np.array(data2)
+# Print the 2d array
+print(arr2)
+```
+
+### 1.6.3 Dimension and shaoe of an aray
+```{python}
+import numpy as np
+data2 = [[1, 2, 3, 4], [5, 6, 7, 8]]
+arr2 = np.array(data2)
+# Get the dimension of the array
+print(arr2.ndim)
+
+#Display the shape of the array
+print(arr2.shape)
+```
+
+### 1.6.4 Create a matrix of zeros
+
+```{python}
+import numpy as np
+
+#Create matrix of 3 x6 matrix of zeros
+print(np.zeros((3, 6)))
+```
+
+### 1.6.5 Create a matrix of ones
+```{python}
+import numpy as np
+#Create matrix of 4 x 2 matrix of ones
+print(np.ones((4,2)))
+```
+
+
+### 1.6.6 Some operations on numpy arrays
+```{python}
+import numpy as np
+G=np.random.randn(2,3)
+print(G)
+# Print the mean of the array
+print(G.mean())
+#Print the variance
+print(G.var())
+```
+
+###1.6.7 More operations on numpy arrays
+
+```{python}
+import numpy as np
+#Operations between numpy arrays
+arr = np.array([[1., 2., 3.], [4., 5., 6.]])
+print(arr)
+# Add  arrays
+print(arr+arr)
+# Subtract an array from another
+print(arr - arr)
+# Perform element wise multiplication of arrays
+print(arr * arr)
+```
+
+###1.6.8 Slicing numpy arrays
+```{python}
+import numpy as np
+#Create an array from 0 to 10 using arange
+arr = np.arange(10)
+print(arr)
+
+# Display the 6th element. Index starts at 0
+print(arr[5])
+#
+#Display from 6th up to 8th
+print(arr[5:8])
+
+```
+
+###1.6.9 Math operations on numpy arrays
+```{python}
+import numpy as np
+#Create an array from 0 to 10 using arange
+arr = np.arange(10)
+arr[5:8] = 12
+print(arr)
+# You can apply operations over the entire array in a single command
+print(np.sqrt(arr))
+print(np.sin(arr))
+```
+
+
+###1.6.10 Creating sequences with numpy arrays
+```{python}
+import numpy as np
+# Generate sequences from start to stop and increase by step
+seq1=np.arange(2,12,3)
+print(seq1)
+# Generate a sequence  between a start abd stop value with 5 equally spaced values
+seq2=np.linspace(start=2,stop=12,num=5)
+print(seq2)
+```
+###1.6.11 Creating random arrays
+```{python}
+import numpy as np
+# This is very useful when trying to simulate certain conditions
+
+#Generating random araays
+# Generate random numbers from the uniform distribution
+print(np.random.rand(2,4))
+
+# Generate random numbers between 0 & 1 from the normal distribution
+print(np.random.randn(2,4))
+
+#Generate random integers
+print(np.random.randint(3,5,size=6).reshape(2,3))
+```
+
+
+
+```{python}
+import numpy as np
+# Reshape as a 5 x 4 matrix
+arr2d = np.arange(20)
+print(arr2d)
+arr2d = np.arange(20).reshape(5,4)
+print(arr2d)
+#Reshape same array as a 2 x 10 matrix
+arr2d=arr2d.reshape(2,10)
+print(arr2d.shape)
+print(arr2d)
+```
+
+###1.6.12 Indexing and slicing arays
+
+```{python}
+import numpy as np
+arr2d = np.arange(20)
+print(arr2d)
+arr2d = np.arange(20).reshape(5,4)
+print(arr2d)
+# Print the element from 2nd row and 3rd column
+print(arr2d[1,2])
+
+# Slicing arr[startRow:endRow,startColumn:endColumn] 
+
+#Slice an array
+print(arr2d[2:4,1:4])
+
+#Slice from the 0th to 3 row and 2 column
+print(arr2d[:3,2])
+
+# Slice all rows but only columns 2 & 3
+# Note if the row or column is not included it implues all rows or all columns
+print(arr2d[:,1:3])
+
+# Display all rows and all columns
+print(arr2d[:,:])
+```
+
+
+
+###1.6.13 Computing sum, mean of arrays
+```{python}
+import numpy as np
+arr = np.random.randn(4, 8) # normally-distributed data
+#Print the mean of the aray
+print(arr.mean())
+print(np.mean(arr))
+print(arr.sum())
+
+```
+
+
+
+###1.7  Pandas 
+Pandas is a Python package  which can handle labeled data, csv or tables extremely well.
+
+
+###1.7.1. Pandas Series 
+```{python}
+# Import the pandas module
+import pandas as pd
+obj = pd.Series([4, 7, -5, 3])
+print(obj)
+# Create a series and also set the indices
+obj2 = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+print(obj2)
+# Print the indices
+print(obj2.index)
+# Print the values
+print(obj2.values)
+print(obj2)
+```
+
+
+
+
+
+### 1.7.2 Pandas dataframes
+
+```{python}
+import numpy as np
+import pandas as pd
+
+# Create 3 arrays with state, year and population
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+print(data)
+# Create a dataframe
+frame = pd.DataFrame(data)
+# The dataframe has 3 columns state, year and pop
+print(frame)
+
+#Create frame2
+frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
+                   index=['one', 'two', 'three', 'four', 'five'])
+print(frame2)
+```
+
+### 1.7.3 Pandas dataframes from arrays
+```{python}
+import numpy as np
+import pandas as pd
+# Create a dataframe from an array
+arr2d = np.arange(20)
+# Reshape array
+arr = np.arange(20).reshape(4,5)
+print(arr)
+# Create dataframe
+df=pd.DataFrame(arr)
+print(df)
+print(df.shape)
+```
+
+### 1.7.4 Important commands on Pandas dataframes 
+There are 3 important commands which are used very often on dataframes
+
+- shape() - Get the shape of the dataframe
+- info() - Get the details of the dataframe
+- columns - Get the names of the columns
+```{python}
+import pandas as pd
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
+                   index=['one', 'two', 'three', 'four', 'five'])
+print(frame2)
+# Important commands on pandas
+print(frame2.shape)
+print(frame2.info())
+print(frame2.columns)
+```
+
+### 1.7.5 Indexing and slicing dataframes
+```{python}
+import pandas as pd
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
+print(data)
+frame = pd.DataFrame(data)
+# The iloc method allows you to use indices much like an array
+# Display all rows and the 1st column
+print(frame)
+print(frame.iloc[1:3,1:3])
+print(frame.shape)
+
+# Display rows 2nd to 4th and column 3
+print(frame.iloc[1:4,2:3])
+
+#Display row with index=1
+print(frame.loc[1:4])
+
+```
+
+
+### 1.7.6 Read an CSV file 
+```{python}
+# Read csv
+import os
+import pandas as pd
+os.chdir("C:\software\RandPythonBook\python-final")
+# Read an XL file
+tendulkar=pd.read_csv('tendulkar.csv',encoding = "ISO-8859-1")
+# Display the top 5 rows
+print(tendulkar.head())
+```
+
+### 1.7.7 Read an Excel file 
+```{python}
+# Read an XL
+import pandas as pd
+car=pd.read_excel('gascar.xls',sheetname='cardata')
+print(car.head())
+
+```
+
+
+### 1.7.8 Common operations on dataframes
+Included below are some of the most common operations on dataframes
+
+- head()
+- tail()
+- shape()
+- columns
+- info()
+
+```{python}
+import os
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar.csv',encoding = "ISO-8859-1")
+
+
+# Display the shape of the dataframe - no of rows and no of columns
+print(tendulkar.shape)
+
+#Display the column names
+print(tendulkar.columns)
+
+# Describe the data frame. The columns and the data types of the columns
+print(tendulkar.info())
+```
+
+
+### 1.7.9 Common operations on dataframes
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar.csv',encoding = "ISO-8859-1")
+#Rename columns as you find appropriate
+tendulkar.columns=['No', 'Runs', 'Mins', 'BF', '4s', '6s', 'SR', 'Pos',
+       'Dismissal', 'Inns', 'Opposition', 'Ground', 'Start Date']
+print(tendulkar.head(5))
+
+```
+
+### 1.8 Cleaning dataframes
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar.csv',encoding = "ISO-8859-1")
+# Cleanup of Runs column
+# Remove rows which have DNB
+tendulkar.Runs
+print(tendulkar.shape)
+# Check all rows in Runs which do not have 'DNB'
+a=tendulkar.Runs !="DNB"
+# Remove rows which have 'DNB'
+tendulkar=tendulkar[a]
+print(tendulkar.shape)
+# Remove rows which have TDNB
+b=tendulkar.Runs !="TDNB"
+tendulkar=tendulkar[b]
+print(tendulkar.shape)
+
+# Remove the '-' character
+c= tendulkar.BF != "-"
+tendulkar=tendulkar[c]
+# Remove the '*' character
+tendulkar.Runs= tendulkar.Runs.str.replace(r"[*]","")
+print(tendulkar.shape)
+# Write to csv file
+tendulkar.to_csv("tendulkar1.csv")
+```
+
+
+### 1.9  Filtering based on row values
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+print(tendulkar.shape)
+
+# Select specific columns from tendulkar dataframe
+df1=tendulkar[['Runs','BF','Ground']]
+print(df1.head())
+
+# Select rwos that meet some condition
+a=tendulkar['Ground']=='Karachi'
+df2=tendulkar[a]
+print(df2.head())
+
+# Filter rows when Groud is Karachi
+df2=tendulkar[tendulkar['Ground']=='Karachi']
+print(df2.head())
+
+# This line will give an error
+b = tendulkar['Runs'] >50
+tendulkar3 = tendulkar[b]
+print(tendulkar3.head())
+```
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+
+# # 18. Filtering rows  and selecting columns
+# Check the type of 'Runs' column (element 0)
+print(type(tendulkar['Runs'][0]))
+#Convert to numeric. Use tab to see options
+tendulkar['Runs']=pd.to_numeric(tendulkar['Runs'])
+tendulkar['BF']=pd.to_numeric(tendulkar['BF'])
+
+# Check the type of 'Runs' column
+print(type(tendulkar['Runs'][0]))
+b=tendulkar['Runs']>50
+
+# Select only rows where Tendulkar scored more than 50
+df3=tendulkar[tendulkar['Runs']>50]
+df3.head()
+print(tendulkar.head(3))
+```
+
+### 2.1  Operating on dates in Pandas
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+
+# Operations on dates
+tendulkar['Start Date']=pd.to_datetime(tendulkar['Start Date'])
+tendulkar.head()
+a=tendulkar['Start Date'] > '01-01-2005'
+tendulkar5K=tendulkar[tendulkar['Start Date'] > '01-01-2005']
+print(tendulkar5K.head())
+
+# iloc can be used for slicing. Similar to handling numpy arrays
+print(tendulkar.iloc[1:4,2:6])
+# .loc is used to select rows by index
+print(tendulkar.loc[[2,5]])
+
+```
+
+### 2.2 Remove NA values in a dataframe
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+
+#Further clean up
+tendulkar2=tendulkar.dropna()
+print(tendulkar2.shape)
+```
+
+### 2.3  Compute the mean of a column
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+#Compute mean of column
+print(tendulkar['Runs'].mean())
+```
+
+### 2.4  Group rows by condition, compute mean and then sort
+
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+# Group by ground and compute mean
+a=tendulkar[['Runs','BF','Ground']].groupby('Ground').mean()
+
+# Sort by ascending Runs
+b=a.sort_values('Runs',ascending=False)
+print(b.head(3))
+tendulkar[['Runs','BF','Ground']].groupby('Ground').mean().sort_values('Runs',ascending=False)
+
+print(tendulkar.head(3))
+```
+
+### 2.5  Group rows by condition, compute mean and then sort
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+# Group rows by some criteria and perform an operation Groupby
+a=tendulkar[['Runs','BF','Ground']].groupby('Ground').mean()
+b=a.sort_values('Runs',ascending=False)
+print(b.head(4))
+
+# Group by Ground, compute mean and sort ascending
+c=tendulkar[['Runs','BF','Ground']].groupby('Ground').mean().sort_values('Runs',ascending=False)
+print(c.head(3))
+
+# Group by Opposition, compute mean and sort ascending
+d=tendulkar[['Runs','BF','Opposition']].groupby('Opposition').mean().sort_values('Runs',ascending=False)
+print(d.head(3))
+# You can add all the commands in a single line 
+f=tendulkar[['Runs','BF','Ground']].groupby('Ground').mean().sort_values('Runs',ascending=False)
+print(f.head(3))
+
+#Compute mean and average of Runs and Balls faced
+g=tendulkar[['Runs','BF','Ground']].groupby('Ground').agg(['sum','mean','count'])
+print(g.head(3))
+```
+
+### 2.6 Lambda operations
+
+Lambda operations allow you to create small anonymous function which compute something. We can then apply these 'lambda' function on a series or columns of a dataframes
+```{python}
+# Python - Operations on list
+a =[5,2,3,1,7]
+b =[1,5,4,6,8]
+
+# Create a lambda function to add 2 numbers
+add=lambda x,y:x+y
+# Add all elements of lists a and b
+print(list(map(add,a,b)))
+
+#or
+#Element wise addition with map & lambda
+print(list(map(lambda x,y: x+y,a,b)))
+#Element wise subtraction
+print(list(map(lambda x,y: x-y,a,b)))
+#Element wise product
+print(list(map(lambda x,y: x*y,a,b)))
+# Exponentiating the elements of a list
+print(list(map(lambda x: x**2,a)))
+
+sum = lambda x, y : x + y
+print(sum(3,4))
+
+# using lamda to compute a sauare
+items = [1, 2, 3, 4, 5]
+squared = list(map(lambda x: x**2, items))   
+print(squared)
+
+```
+
+### 2.7 Lambda operations on an entire column of a data frame
+```{python}
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+tendulkar['4s']=pd.to_numeric(tendulkar['4s'])
+tendulkar['4s'].apply(lambda x:4*x)
+```
+
+### 2.8 Lambda operations  to convert from Celsius to Fahrenheit
+```{python}
+# Convert Celsius to Fahrenheit
+Celsius = [39.2, 36.5, 37.3, 37.8]
+Fahrenheit = list(map(lambda x: (float(9)/5)*x + 32, Celsius))
+print(Fahrenheit)
+```
+
+
+## 2.9 a Python functions
+
+```{python}
+# Use the def key word to define function
+def product(x,y):
+    value=x*y
+    return(value)
+
+# Invoke the function
+product(8,9)
+
+```
+
+
+
+## 3.1  Plotting a scatterplot
+```{python}
+import matplotlib.pyplot as plt
+# Scatter plot
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+
+plt.scatter(tendulkar.BF,tendulkar.Runs)
+# Set the title of plot
+plt.suptitle('Tendulkars Runs vs Balls faced', fontsize=20)
+# Set x and y axis labels
+plt.xlabel('Balls faced', fontsize=18)
+plt.ylabel('Runs', fontsize=16)
+plt.savefig('fig1.png', bbox_inches='tight')
+#plt.show()
+```
+
+## 3.2  Plotting a histogram
+```{python}
+ #Histogram
+import matplotlib.pyplot as plt
+# Scatter plot
+import pandas as pd
+tendulkar=pd.read_csv('tendulkar1.csv',encoding = "ISO-8859-1")
+
+plt.hist(tendulkar['Runs'])
+plt.suptitle('Tendulkars histogram of Runs ', fontsize=20)
+plt.xlabel('Frequency', fontsize=18)
+plt.ylabel('Runs', fontsize=16)
+plt.savefig('fig2.png', bbox_inches='tight')
+#plt.show()
+```
+
+
+
+
+

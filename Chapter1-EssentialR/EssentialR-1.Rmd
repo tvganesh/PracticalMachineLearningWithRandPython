@@ -1,0 +1,1079 @@
+---
+title: "Essential R"
+author: "Tinniam V Ganesh"
+date: "April 29, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Introduction
+## 1.1 Installing R and R Studio
+Install the latest R version [CRAN](https://cran.r-project.org/bin/windows/base/). Also install [RStudio](https://www.rstudio.com/products/rstudio/download/). RStudio is one of the  best IDEs for developing in R
+
+## 1.2 R basics
+R is a very friendly lanuguage and flexible in many ways.  We can start anywhere in the line, and continue onto the next line, There is no continuation character as in other languages, no statement delimiters. As long as you end a line with an operator you can continue on to the next line. Also in R, the assignment is the "<-", though the '=' also works. 
+
+## 1.3 Variables
+```{r}
+# Comments in R have a '#' as the start character. This line is a comment.
+c <- 5.26  # No variable definitions or declarations
+c    # Display the value of c by writing the variable in a separate line
+a <- 5 * 3 +    # No line continuation character, no statement delimiters
+     2/6
+a
+      c <- 4 + 2.679 +    # Start anywhere and continue to the next line by ending the line with an operator
+                 23*7/8
+```
+
+#Note: 
+In R we can display the value of a variable, matrix, dataframe by typing it on a separate
+line as shown below
+```{r}
+c
+```
+## 1.4 Variable types
+R has the following variable types
+
+1.Character
+2.Integer
+3.Numeric
+4.Logical
+5.Complex
+6.Raw
+
+You can check the variable type by using the "class" command. This is a very useful command
+and often times, we may need to check the variable type before trying to use it in computations/plots etc.
+```{r}
+x<- "Hello world" # Can also use x= "Hello World"
+x
+class(x)
+y<-2.5
+y
+class(y)
+
+```
+
+## 1.5.  Vectors - All elements of same type
+In a vector all elements are of the same type. If you create a vector with numeric and
+character values, then all elements will be converted to character. You can check the type
+of a variable by using 'class'
+```{r}
+#2.  Vectors - All elements of same type
+# Create a numeric vector. Note: Enter values within c(,,,)
+myvector <- c(1,2,4,5,8,10,12) 
+#Display value of myvector
+myvector
+myvector <- 2:12
+myvector
+
+# Create a character vector
+charVector <- c("one","two","three") # character vector
+charVector
+
+# Create a numeric vector myvector2
+myvector2 <- c(5,7,9,12)
+#Check the type of the vector2
+class(myvector2)
+
+# Concatenate myvector2 with a character vector
+myvector2 <-c(myvector2,"the")
+# Check the class again
+class(myvector2)
+class(myvector2[1])
+```
+
+You can get the length of the vector with
+```{r}
+# use length to determine the number of elements in vector
+length(myvector)
+```
+
+## 1.6 Sequences
+Vectors can also be created by using the "seq" command. 
+```{r}
+# Creating vectors with sequences. In the example below, the sequence starts at 5 and ends at 50 and is incremented of 5
+myvector <- seq(5,50,by=5)
+myvector
+
+# Create a sequence between 6 & 43 with a period length of 7
+seq(6,43,by=7)
+
+# This is useful when we want 7 equal intervals between 6 & 43
+seq(6,43,length=7)
+
+```
+
+
+## 1.7 Repeating sequences
+Repeating sequences can be created  as below
+```{r}
+a <- rep(5:9,times=3)
+a
+b <- rep(3:7,len=2)
+b
+```
+
+
+
+## 1.8. To get  help on any topic use '?' or help(<R function>)
+```{r}
+# Get help on any topic using '?'
+?seq
+
+# You can also use help. This is commented to avoid displaying it again.
+#help(seq)
+
+```
+
+## 1.9 Finding index of value in sequence
+A useful command is 'which' which returns the index where a value(s) are found
+```{r}
+
+myvector <- c(1,2,4,5,8,4, 10,12)
+# Use 'which' to get the index(indices) while checking for a value
+which(myvector == 4)
+```
+
+
+
+## 2.1 Matrix,lists and dataframes
+
+Create  5 x 4 numeric matrix
+```{r}
+# Create  5 x 4 numeric matrix
+y<-matrix(1:20, nrow=5,ncol=4)
+y
+class(y)
+```
+
+## 2.2 Lists
+In lists the elements can be dissimilar. The list belowhas the following objects
+a) Character variable b) character vector c) matrix and 4) numeric variable
+```{r}
+w <- list(name="Fred", mynumbers=charVector, mymatrix=y, age=5.3)
+# Display w
+w
+```
+
+## 2.3 Data frames
+A data frame is the most common data types in R. Most data analysis is done on dataframes.
+Dataframes can be thought of as Excel sheets with rows  and columns. Each column can be of
+a different type, but all elements in the column must be of the same type.
+```{r}
+d <- c(1,2,3,4)
+e <- c("red", "white", "red", NA)
+f <- c(TRUE,TRUE,TRUE,FALSE)
+mydataframe <- data.frame(d,e,f)
+names(mydataframe) <- c("ID","Color","Passed") # variable names
+mydataframe
+class(mydataframe)
+```
+
+## 2.4 Subsetting
+Subsetting vectors
+```{r}
+myvector <- seq(2,20,by=2)
+myvector
+```
+
+Get the 4 element in myvector. Note in R the indices start from 1 to N and 0 to N-1 as is
+common in C,C++,Java or Python.
+```{r}
+myvector[4]
+```
+
+## 2.5 Get a range of elements,  from the 3rd to 7th
+```{r}
+s <- myvector[3:7]
+s
+```
+
+## 2.6 Subset based on a condition
+```{r}
+myvector <- seq(2,20,by=2)
+myvector
+# Find all values of myvector which are greater than 10
+b <- myvector>10
+# B is a logical vector of 'TRUE' and 'FALSE'
+b
+# Subset myvector with the logical vector
+a <- myvector[b]
+a
+```
+
+It is possible  to combine both in a single statement as shown below
+```{r}
+# Subset myvector for values > 10
+a <- myvector[ myvector > 10]
+```
+
+## 2.7 Exclude elements from vector
+To leave out an element from a vector we can use the '-index' as below
+```{r}
+# Remove the 2nd element from myvector
+myvector[-2]
+```
+
+## 2.8 Subsetting a vector based on a substring 
+```{R}
+m <- c("about","aboard","board","bus","cat","abandon")
+a <- grep("ab",m)
+a
+# String with "ab"
+containsAB <- m[a]
+# Or combine both statements into a single statement
+containsAB <- m[grep("ab",m)]
+containsAB
+```
+
+## 2.9 Operations on vectors
+We can do arithmetic and logical operation on vectors
+```{r}
+myvector <- seq(2,20,by=2)
+myvector
+# Arithmetic operations on vectors
+myvector1 <- seq(3,30,by=3)
+myvector1
+
+# Addition of 2 vectors
+a <- myvector + myvector1
+a
+# Product of 2 vectors
+b <- myvector * myvector1
+b
+# Raising element to a power
+myvector^3
+
+#Logical operations on 2vectors
+a <- myvector < myvector1
+a
+
+```
+
+Arithmetic and logical operations between  vectors can be performed as long as the length of one of the vectors is a multiple of the other
+
+```{r}
+a <- c(1,2,9,4,12,6)
+b <- c(7,8)
+
+a+b
+a-b
+a<b
+
+```
+
+
+## 3.1  Accessing elements in matrix
+We can access elements in a matrix by specifying the row and the column index. We can also specify the row and the column vector
+```{r}
+y<-matrix(1:20, nrow=5,ncol=4)
+y
+y[2,3]
+```
+
+## 3.2 Matrix operations
+Included below are some key matrix operations. R has several packages that deal with matrices for various analysis. Some of the main operations are shown below
+
+```{r}
+A <- matrix(1:9,nrow=3,ncol=3)
+B <- matrix(seq(5,10,length=9),nrow=3,ncol=3)
+```
+
+## 3.3 Some key matrix operations
+
+```{r}
+# Matrix addition
+C <- A+B
+C
+# Matrix subtraction
+C <- A -B
+C
+# Element wise matrix multiplication
+C = A*B                   
+C
+#Matrix multiplication
+C = A %*% B 
+C
+```
+
+
+## 3.4 Subsetting lists
+Lists can be subsetted using an index and a double square bracket
+```{r}
+w <- list(name="Fred", mynumbers=charVector, mymatrix=y, age=5.3)
+w
+
+
+# To access an object in a list , use [[]]e.g
+w[[2]]
+# You can further access the elements in the object depending on the type
+a = w[[2]] #a is a vector
+a[2]
+b=w[[3]]
+b
+#
+b[2,3]
+```
+
+## 3.5. Subsetting dataframes
+```{r}
+head(mtcars,3)
+# We can subset like matrices
+# Dataframe 'df' are subsetted as
+#df[row,column]/df[row vector,column vector]
+mtcars[2,3]
+
+# We can also subset by providing the row & column vectors as  df[row vector,column vector]
+mtcars[2:5,3:6]
+
+
+# If the row/row vector is not included then it means all rows
+#Get all rows but only columns 3 to 7
+a=mtcars[,3:7]
+# Display only 4 rows of a 
+head(a,4)
+
+
+# If the column/column vector is not included then it means all rows
+# Get all columns for rows 2 to 5
+mtcars[2:5,]
+```
+
+## 3.6 Check column names
+To check the column names of a dataframe we can either use names() or colnames()
+```{r}
+names(mtcars)
+colnames(mtcars)
+```
+
+## 3.7 Access a specific column by name 
+To access a column by name use the <dataframe>$<columnname>
+```{r}
+mtcars$mpg
+```
+
+## 3.8 Find all rows where mpg >15
+We can also subset based on a specific condition. To subset all rows of 
+dataframe where mpg >15.0 we can use
+
+```{r}
+a <- mtcars$mpg>15
+a
+
+#Subset the dataframe using this logical vector for the row vector. Leave
+# the column empty
+b <- mtcars[a,]
+b
+```
+
+## 3.9 Subset on compound condition
+To subset on a compound condition we Can also write and assign the output to a logical vector. We can then subset all rows based on this logical vector.
+```{r}
+a <- mtcars$mpg>15 & mtcars$mpg <25
+a
+
+# Subset using the logical vector 'a' and select all columns (no column vector)
+c <- mtcars[a,]
+c
+
+```
+
+## 4.1 Some common directory and file handling commands
+Included below are some common file and directory commands in R
+
+Get the current working directory
+```{r}
+
+getwd()
+```
+
+Set the working directory. Note the forward slash
+```{r}
+
+setwd("C:/software/R")
+getwd()
+```
+
+Go up one directory and then the current directory
+```{r}
+
+setwd("..")
+getwd()
+```
+
+Show all objects in the environment
+```{r}
+ 
+ls()
+```
+
+Remove  a specific object for e.g. 'myvector which was created earlier
+```{r}
+rm("myvector")
+```
+
+
+This is a particularly useful command. We need this so that we can start
+with a clean slate and don't have variables left by some previous operations
+
+Remove all objects.
+```{r}
+rm(list=ls())
+```
+
+Show contents of dir
+```{r}
+dir()
+```
+
+Other useful commands
+Create a directory
+```{r}
+dir.create("testdir")  
+```
+
+Create a file
+```{r}
+file.create("myTest.R")  
+```
+
+Check if file exists
+```{r}
+file.exists("mytest.R") 
+```
+
+Rename a file
+```{r}
+file.rename("mytest.R","mytest2.R")     
+```
+
+# To print an object
+```{r}
+myvector <- seq(2,20,by=2)
+myvector
+myvector
+print(myvector)
+```
+
+## 4.2For loops
+There are 2 ways to write 'for' loops. However one should avoid 'for' loops,  as 'for' loops are very performance intensive. Try to use vectors instead of 'for' loops wherever possible
+```{r}
+for(i in 1:5){
+  print(i*5)
+}
+
+for(i in seq_along(myvector)){
+  print(myvector[i])
+}
+```
+
+Avoid 'for' loops if possible. Try to use vector functions using sapply,lapply,tapply
+# instead of for loops. for loops are very performance intensive to vector operations
+
+
+## 4.3 R functions. To create a function
+A function definition is given below. The return value is usually made the last statement of the function. In the function below the return is the value 'c'
+```{r}
+
+product <- function(a, b){
+  c <- a*b
+  c
+}
+```
+
+Invoke the function
+```{r}
+product(7,12)
+product(13,18)
+```
+
+
+##4.4 Accessing elements in a dataframe
+There are several datasets available that comes with R
+The Dataframe is a tabular form of data with many rows and columns. The
+type of data can vary from column to column but are the same in each column
+```{r}
+data()
+class(iris)
+```
+
+Create a new data frame from iris. Iris is a small plant.
+See https://en.wikipedia.org/wiki/Iris_(plant)
+Display the iris dataframe by typing it on a separate line
+```{r}
+head(iris,5)
+```
+
+
+## 4.5 Check the size of the dataframe
+```{r}
+dim(iris)
+```
+
+## 4.6 Check the 1st few rows of the data frame
+```{r}
+head(iris)
+```
+
+## 4.7 The str() function
+A very useful command to check the class of all columnsin a dataframe is. The 'str' command lists the columns in the dataframe, their type and also displays a few representative values from eachcolumn
+```{r}
+str(iris)
+```
+
+## 4.8 The summary() function
+We could also use the 'summary' command to get an overall view of dataframe.However the 'str' command is more powerful than the 'summary' command
+
+```{r}
+summary(iris)
+```
+
+## 4.9 Name of columns in dataframe
+To check the column names of iris we cause one of the following. They are both same
+
+```{r}
+colnames(iris) 
+
+#or 
+names(iris)
+```
+
+## 5.1 Check the type of each column
+We often need to check the class of every column. We could do this one by one or simply use
+```{r}
+sapply(iris,class)
+```
+
+## 5.2 Inspect the dataframe
+To inspect the data. Display top 6 and bottom 6 of the dataframe
+```{r}
+head(iris,6)
+tail(iris,6)
+```
+
+
+## 5.3 Subset a dataframe
+1. Display 1-6 rows and 2-4 columns. This similar to how we subsetted the matrix
+We can use df[row,column] or df[row vector, column vector]
+```{r}
+iris[1:6,2:4]
+```
+
+Display all rows  for columns 1:3. If the row/row vector is omitted then display all rows
+```{r}
+df<-iris[,1:3]
+#Display top 5 rows
+head(df,5)
+```
+
+Display all columns for rows 1:5. If the column/column vector is omitted then display all columns
+```{r}
+iris[1:5,]
+```
+
+## 5.4 Rename columns
+
+To rename columns,  we use the same function 'colnames' and assign to it a character vector as shown here
+```{r}
+colnames(iris) <- c("lengthOfSepal","widthOfSepal","lengthOfPetal","widthOfPetal","Species")
+colnames(iris)
+```
+
+## 5.5 View a dataframe
+To  view a dataframe use the 'View' command
+```{r}
+#This has been commented but you can try this command in RStudio
+#View(iris)
+```
+
+
+
+## 5.6 To subset based on a value in a column
+```{r}
+a <- iris$Species == "setosa"
+#Subset these rows. The "," indicates include all colums for these rows. Here for the row #vector we use the logical vector and we leave the column vector indicating we will require #all columns
+b <- iris[a,]
+#Check the dimemsion ofthe 'b' dataframe
+dim(b)
+
+```
+
+
+## 5.7 Refer by column
+```{r}
+colnames(b)
+b$widthOfSepal
+```
+
+## 5.8 Compute the mean and standard deviation of  column
+
+```{r}
+meanSepal <- mean(b$widthOfSepal)
+meanSepal
+sdSepal <- sd(b$widthOfSepal)
+sdSepal
+```
+
+
+A very useful function is 'sapply' with which can apply  a function across vectors. In the R statement below we have 4 column vectors of iris and we apply the function 'mean' to each  of these column vectors
+
+## 5.9 sapply()
+```{r}
+m <- sapply(iris[1:4],mean)
+m
+```
+
+## 6.1 Boxplot
+To  take a quick look at a specific column the box plot is particulary useful. To take a look at the documentation for a boxplot type ?boxplot
+```{r}
+#?boxplot
+```
+
+Create a bixplot for the length of the sepal column of the Iris dataframe. The title of the plot requires the use of the 'main=' argument
+```{r fig1,cache=TRUE}
+boxplot(b$lengthOfSepal,main="Length of Sepal")
+```
+
+
+## 6.2 Display multiple plots
+Often we may need to display a boxplot for all the 4 numerical column vectors of Iris namely - widthOfSepal, lengthOfSepal, widthOfPetal & lengthOfPetal. The way to do this is to use the 'par' function with the 'mfrow' which specifies that we would like  4 plots in a 2 x 2 matrix setup.Draw all 4 plots. The 'mar=' parameter indicates the margins
+```{r fig2,cache=TRUE}
+par(mfrow=c(2,2)) # Set 2 rows x 2 columns
+par(mar=c(4,4,2,2)) # Set the margins
+boxplot(b$lengthOfSepal,main="Length of Sepal")
+boxplot(b$widthOfSepal,main="Width of Sepal")
+boxplot(b$lengthOfPetal,main="Length of Petal")
+boxplot(b$widthOfPetal,main="Width of Petal")
+```
+
+## 6.3 Reset the display
+Reset the display with the following call. Otherwise you will get a 2 x 2 plots
+```{r}
+dev.off()
+```
+
+## 6.4 Pairs plot
+A useful function to to check how data looks is the pairs function.This function will take pairs of columns and do a scatter plot. This will tell us how the columns are correlated
+```{r fig3,cache=TRUE}
+pairs(iris)
+```
+
+## 6.5 Cor() function
+R also provides a way to compute the correlation numerically as follows
+#Length of Petal is positively correlated to width of Petal and length of Sepal
+```{r}
+cor(iris[,1:4])
+```
+
+
+## 6.6 Scatter plot
+
+```{r fig4,cache=TRUE}
+plot(iris$widthOfSepal,iris$lengthOfSepal)
+```
+
+## 6.7 Add Title and Axis labels to plot
+To this plot add the x-axis & y-axis labels along with the title of the plot use xlab, ylab and main parameters
+
+```{r fig5,cache=TRUE}
+plot(iris$widthOfSepal,iris$lengthOfSepal,
+     main="Iris - Length of Sepal vs Width of Sepal", xlab="Sepal Width",
+     ylab="Sepal length")
+```
+
+## 6.8 Cleaning data
+The IRIS data set is neat and tidy. However almost all real world data is unclean, has many missing values, spaces for values or other junk characters. We must first  'clean' the data before applying any visualization or Machine Learning models on the data. Check the help of read.csv using ?read.csv
+
+## 6.9  Read the tendulkar dataframe
+```{r}
+tendulkar= read.csv("tendulkar.csv",stringsAsFactors = FALSE,na.strings=c(NA,"-"))
+```
+
+The 'summary' is a useful command for describing the overall content and structure of a dataframe
+```{r}
+summary(tendulkar)
+```
+
+The 'str' command is another command to get an overall description of the dataframe. 
+```{r}
+str(tendulkar)
+```
+
+Check the names of the columns for the dataframe 'tendulkar'
+```{r}
+colnames(tendulkar)
+```
+
+Check the dimensions of the tendulkar dataframe.  
+```{r}
+dim(tendulkar)
+```
+
+Display top 5 and bottom 5 rows
+```{r}
+head(tendulkar)
+tail(tendulkar)
+```
+
+As mentioned before if we want to check the class of all columns we can use the sapply() function to get the types of all columns
+```{r}
+sapply(tendulkar,class)
+```
+
+
+# View the data frame
+To view a dataframe in RStudio you can use the View(df)
+```{r}
+#View(tendulkar)
+```
+
+Real world data will require a lot of cleaning before you can use it
+
+```{r}
+# Remove all rows which have DNB (Did Not Bat) in the 'Runs' column, or in other words 
+# select rows which do not have the 'DNB' value. This is given by the '!=' or not 'equal
+# to' #logical operator. Assign the result to a logical vector a
+a <- tendulkar$Runs != "DNB"
+head(a,3)
+```
+
+```{r}
+#Now subset all rows based on the logical vector 'a', 
+tendulkar <- tendulkar[a,]
+dim(tendulkar)
+```
+
+
+```{r}
+# Next remove all rows with TDNB (Team Did Not bat) 
+c <- tendulkar$Runs != "TDNB"
+tendulkar <- tendulkar[c,]
+```
+
+
+```{r}
+# Further remove all rows which have 'absent' in the Runs column and subset as before
+d <- tendulkar$Runs != "absent"
+tendulkar <- tendulkar[d,]
+```
+
+
+```{r}
+# Check the size of the tendulkar dataframe
+dim(tendulkar)
+```
+
+
+```{r}
+# Finally remove the "*"" indicating 'not out
+tendulkar$Runs <- gsub("\\*","",tendulkar$Runs)
+```
+
+
+```{r}
+# Check the size of the cleaned tendulkar dataframe
+dim(tendulkar)
+```
+
+## 7.1 Complete cases
+Another useful function for cleaning data is complete.cases. Check the documentation on
+'complete.cases()' 
+```{r}
+#?complete.cases
+```
+
+
+```{r}
+# Check if all rows are complete 
+c <- complete.cases(tendulkar)
+#Subset the rows which are complete
+tendulkar <- tendulkar[c,]
+```
+
+Check the size of the tendulkar dataframe after all the above steps (a) to (e) for cleaning
+```{r}
+dim(tendulkar)
+```
+
+
+```{r}
+head(tendulkar,10)
+```
+
+We can now do any sort of data analysis on the clean data using the many R packages that R comes with.
+
+## 7.2 Base plot
+R, by default,  comes with some plotting ability. This is known as 'base plot'. Base plotting is easy to do. In the plot below, the function plot(x,y)
+```{r fig51,cache=TRUE}
+plot(tendulkar$BF,tendulkar$Runs)
+```
+
+To add a title and x and y labels we need to invoke the plot function with additional parameters viz. 'xlab' for the X-axis label, 'ylab' for the Y-Axis label and 'main' to specify the plot titile
+
+``` {r fig6,cache=TRUE}
+plot(tendulkar$BF, tendulkar$Runs,pch=18, main="Tendulkar Runs scored vs Balls Faced",
+     xlab="Balls Faced", ylab='Runs')
+```
+
+We can also fit a linear regression model between the Runs scored and the Balls faced by Tendulkar with the 'lm' call. To know more about 'ln' use ?lm
+```{r}
+#?lm
+
+```
+
+## 7.3 Fit a linear regression line
+Compute and  plot a linear regression lime
+Here Runs = a0 + a1 * BF
+```{r fig7,cache=TRUE}
+fit <-lm(tendulkar$Runs ~tendulkar$BF)
+fit
+plot(tendulkar$Runs ~tendulkar$BF,xlab="Balls Faced",ylab="Runs",main="Tendulkar's Runs vs Balls Faced")
+summary(fit)
+abline(fit,lty=5,lwd=3,col="blue")
+```
+
+
+## 7.4 Draw the histogram
+```{r fig8,cache=TRUE}
+#Plot the histogram of runs for Tendulkar
+df = tendulkar
+hist(as.numeric(df$Runs), main="Tendulkar's frequency of runs vs  run ranges",
+     xlab="Runs")
+
+
+abline(v=median(df$Runs),col="blue",lwd=3.0)
+#Q11 Add a red line showing the mean runs for Tendulkar
+abline(v=mean(df$Runs),col="red",lwd=3.0)
+```
+
+## 7.5 dplyr package
+A look package dplyr. One of the most useful package for manipulating data in
+data frames
+
+```{r}
+# Install package if necessary
+#install.packages("dplyr")
+#Call the library to the package to include dplyr
+library(dplyr)
+# Select columns
+colnames(tendulkar)
+
+# Key functions select, filter, arrange, pipe,mutate, summarise
+
+# Subset specific columns by name of column using 'select'. Note there is no '$' sign or quotes to refer to # columns
+df1 <- select(tendulkar, Runs,Mins,BF)
+head(df1)
+
+# This can be also written as below, where %>% is known as the 'pipe'
+df1 <- tendulkar %>% select(Runs,Mins,BF)
+
+
+# Subset rows, using 'filter' where the RUns are > 50 and less than 101
+df2 <- filter(tendulkar,Runs>50 & Runs < 101)
+head(df2,5)
+# Also as
+# df2 <- tendulkar %>% filter(Runs>50 & Runs < 101)
+```
+
+## 7.6 Clean the dataframe with dplyr
+```{r}
+
+# Using dplyr to clean the Tendulkar dataframe
+tendulkar= read.csv("tendulkar.csv",stringsAsFactors = FALSE,na.strings=c(NA,"-"))
+dim(tendulkar)
+#Remove rows for which Tendulkar$Runs was "DNB"
+tendulkar <- tendulkar %>% filter(Runs != "DNB")
+dim(tendulkar)
+
+#Remove rows for which Tendulkar$Runs was "TDNB"
+tendulkar <-  tendulkar %>% filter(Runs != "TDNB")
+dim(tendulkar)
+
+#Remove rows for which Tendulkar was "absent"
+tendulkar <- tendulkar %>% filter(Runs != "absent")
+#Finally we remove '*' as before
+tendulkar$Runs <- gsub("\\*","",tendulkar$Runs)
+class(tendulkar$Runs)
+tendulkar$Runs <- as.numeric(tendulkar$Runs)
+
+# Get only complete cases as before
+c <- complete.cases(tendulkar)
+tendulkar <- tendulkar[c,]
+dim(tendulkar)
+```
+
+## 7.7 Sort rows in descending order using 'arrange'
+```{r}
+# There are more interesting conditions with which you can filter and select rows
+# columns. Check with ?select & ?filter
+
+# Use the arrange function to arrange columns in descending order of Runs
+descRuns <- arrange(tendulkar,desc(Runs))
+class(tendulkar$Runs)
+head(descRuns)
+```
+
+## 7.8 Create a new column with 'mutate'
+```{r}
+# Create a new column with Strike rate
+tendulkar <- tendulkar %>% mutate(StrikeRate=(Runs/BF)*100)
+```
+
+
+## 7.9 Group rows
+```{r}
+a <- group_by(tendulkar, Ground)
+head(a)
+```
+
+## 8.1 Chain all dplyr columns
+```{r fig9,cache=TRUE}
+
+# The following command in a single line does the follwoing
+#1. Uses the data frame tendulkar (2nd parameter)
+#2. Groups the runs scored by ground
+#3. Computes the mean runs in each group
+#4. Arranges in descending order
+
+tendulkar1 <- tendulkar %>% group_by(Ground) %>% summarise(meanRuns= mean(Runs)) %>%
+  arrange(desc(meanRuns))
+
+
+# Plot the result as a barplot
+barplot(tendulkar1$meanRuns,names=tendulkar1$Ground,las=2,ylab="Average Runs",
+        col=rainbow(length(tendulkar1$meanRuns)),main="Tendulkar's average runs in Grounds",cex.names=0.8)
+```
+
+## 8.2 Grammar of Graphics - ggplot2
+```{r fig10,cache=TRUE}
+library(ggplot2)
+
+p <- ggplot(tendulkar) + aes(x=Runs,y=BF) + geom_point()
+p <- p + xlab("Runs") + ylab("Balls Faced") + ggtitle("Tendulkar - Runs vs Balls Faced")
+p
+
+ggplot(tendulkar,aes(x=Runs,y=BF))+ geom_point() +
+  xlab("Runs") + ylab("Balls Faced") + ggtitle("Tendulkar - Runs vs Balls Faced")
+
+# Fit a smoothed regression line
+ggplot(tendulkar,aes(x=Runs,y=BF))+ geom_point() + geom_smooth(method="loess") +
+  xlab("Runs") + ylab("Balls Faced") + ggtitle("Tendulkar - Runs vs Balls Faced") +
+  theme(plot.title = element_text(size=16, face="bold",hjust=0.5))+ 
+    theme(axis.text.x = element_text(size=14,angle = 90, hjust = 1))
+```
+
+
+```{r fig11,cache=TRUE}
+
+# Using dplyr and ggplot2
+tendulkar1 <- tendulkar %>% group_by(Opposition) %>% summarise(meanRuns= mean(Runs)) %>%
+    arrange(desc(meanRuns))
+head(tendulkar1,10)
+
+ggplot(tendulkar1,aes(x=Opposition,y=meanRuns,fill=Opposition)) + 
+    geom_bar(stat="identity") 
+
+# Rework this to reorder from biggest to smallest and title and labels 
+# Also rotate the x axis labels by 90 degrees
+ggplot(tendulkar1,aes(x=reorder(Opposition,-meanRuns),y=meanRuns,fill=Opposition)) + 
+    geom_bar(stat="identity") +
+    ggtitle("Tendulkar's Mean Runs against opposition") +
+    xlab("Opposition") + ylab("Mean Runs")+ 
+    theme(axis.text.x = element_text(size=14,angle = 90, hjust = 1))
+```
+
+
+
+## 8.3 Going back to the Iris example- Plotting with base plot
+```{r fig12,cache=TRUE}
+names(iris)
+# Rename columns, if needed, to something more is easy to refer to
+colnames(iris) <- c("lengthOfSepal","widthOfSepal","lengthOfPetal","widthOfPetal","Species")
+colnames(iris)
+
+setosa <- iris %>% filter(Species == "setosa")
+#Correlation between columns
+pairs(setosa)
+a <- setosa %>% select(lengthOfSepal,widthOfSepal)
+plot(a$lengthOfSepal,a$widthOfSepal,xlab="Length of Sepal",ylab="Width of Sepal",
+     main="Length vs Width of Sepal of Setosa")
+l <-lm(a$widthOfSepal~a$lengthOfSepal)
+abline(l,lty=5,lwd=3,col="blue")
+```
+
+Plot IRIS with ggplot2
+```{r fig13,cache=TRUE}
+str(iris)
+# This can be with ggplot as follows for all species
+ggplot(iris,aes(x=lengthOfSepal,y=widthOfSepal,colours=Species)) + geom_point() +
+  geom_smooth(method="loess") + facet_wrap(~Species) +
+  xlab("Length of Sepal") + ylab("Width of Sepal")
+
+```
+## 8.4 Package lubridate.
+# This package is useful for handling date files in most formats
+#dmy,ymd,dmyhhmmss,dd-mm-yy hh:mm:ss
+
+```{r fig14,cache=TRUE}
+#install.packages9"lubridate")
+library(lubridate)
+start<-ymd("20110604")
+day(start)
+month(start)
+year(start)
+
+end=mdy("08-04-2011")
+timespan <- end-start
+timespan
+c <- end+5
+c
+
+# There is a  lot more that can be done with lubridate
+head(tendulkar,5)
+
+# Creating a moving average of runs for Tendulkar with ggplot
+runs <- tendulkar %>% select(Runs,Start.Date)
+runs$Start.Date <- dmy(runs$Start.Date)
+head(runs)
+ggplot(runs,aes(x=Start.Date,y=Runs)) + geom_line(colour="darkgrey") +
+  geom_smooth(method="loess") + ggtitle("Tendulkar's moving average of runs") +
+  theme(plot.title = element_text(size=16, face="bold",hjust=0.5))
+
+```
+
+## 8.5 Other useful compact statements with dplyr and ggplot2
+
+Plot Tendulkar runs by ground
+```{r fig15,cache=TRUE}
+# The x axis labels are rotated by 90 degrees
+tendulkar1 <- tendulkar %>% group_by(Ground) %>% summarise(meanRuns= mean(Runs)) %>%
+  arrange(desc(meanRuns))
+top10 <- head(tendulkar1,10)
+ggplot(top10,aes(x=reorder(Ground,-meanRuns),y=meanRuns,fill=Ground)) + 
+  geom_bar(stat="identity") +
+  ggtitle("Tendulkar's Mean Runs in Grounds") +
+  xlab("Grounds") + ylab("Mean Runs") + 
+    theme(axis.text.x = element_text(size=14,angle = 90, hjust = 1))
+```
+
+## 8.6 Plotting Error bar
+Plot Tendulkar runs against opposition with error bar
+```{r fig16,cache=TRUE}
+# The x axis labels are rotated by 90 degrees
+tendulkar1 <- tendulkar %>% group_by(Opposition) %>% 
+  summarise(meanRuns= mean(Runs),sdRuns=sd(Runs)) %>%
+  arrange(desc(meanRuns))
+top10 <- head(tendulkar1,10)
+top10
+ggplot(top10,aes(x=reorder(Opposition,-meanRuns),y=meanRuns,fill=Opposition)) + 
+  geom_bar(stat="identity") +
+  geom_errorbar(width=.1, aes(ymin=meanRuns-sdRuns, 
+                              ymax=meanRuns+sdRuns)) +
+  ggtitle("Tendulkar's Mean Runs against opposition") +
+  xlab("Opposition") + ylab("Mean Runs") + 
+    theme(axis.text.x = element_text(size=14,angle = 90, hjust = 1))
+
+```

@@ -1,0 +1,632 @@
+---
+title: "R vs  Python: Different similarities and similar differences"
+author: "Tinniam V Ganesh"
+date: "May 18, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R versus Python 
+A debate about which  language is better suited for Datascience, R or Python, can set off diehard fans of these languages into a tizzy. This post tries to look at some of the different similarities and similar differences between these languages. To a large extent the ease or difficulty in learning R or Python is subjective. I have heard that R has a steeper learning curve than Python and also vice versa. This probably depends on the degree of familiarity with the languuge
+To a large extent both R an Python do the same thing in just slightly different ways and syntaxes. The ease or the difficulty in the R/Python construct's largely is in the 'eyes of the beholder' nay, programmer' we could say. I include my own experience with the languages below.
+
+###1. R data types
+R has 2 data types
+
+a) Character 
+b) Numeric
+
+Python has several data types
+
+a) Int
+b) float
+c) Long
+d) Complex
+and so on
+
+- R has the type vector which in Python is closely related to a list
+- To know the type of the variable we use the following for R and Python
+- R & Python use length & len respectively to get the length of a vector and list respectively
+
+###2. R Vector vs Python List
+A common data type in R is the vector. Python has a similar data type, the list
+
+```{r cache=TRUE}
+# R vectors
+a<-c(4,5,1,3,4,5)
+print(a[3])
+print(a[3:4]) # R does not always need the explicit print. 
+#R type of variable
+print(class(a))
+# Length of a
+print(length(a))
+```
+
+```{python cache=TRUE}
+# Python lists
+a=[4,5,1,3,4,5] # 
+print(a[2]) # Some python IDEs require the explicit print
+print(a[2:5])
+print(type(a))
+# Length of a
+print(len(a))
+```
+
+###2a. Other data types - Python
+Python also has certain other data types like the tuple, dictionary etc as shown below. R does not have as many of the data types, nevertheless we can do everything that Python does in R
+
+```{python cache=TRUE}
+# Python tuple
+b = (4,5,7,8)
+print(b)
+
+
+#Python dictionary
+c={'name':'Ganesh','age':54,'Work':'Professional'}
+print(c)
+#Print type of variable c
+
+```
+
+
+###2.Type of Variable 
+To know the type of the variable in R we use 'class', In Python the corresponding command
+is 'type'
+
+```{r cache=TRUE}
+#R - Type of variable
+a<-c(4,5,1,3,4,5)
+print(class(a))
+
+```
+
+```{python cache=TRUE}
+#Python - Print type of tuple a
+a=[4,5,1,3,4,5]
+print(type(a))
+b=(4,3,"the",2)
+print(type(b))
+```
+
+###3. Length 
+To know length in R, use length()
+```{r cache=TRUE}
+#R - Length of vector
+# Length of a
+a<-c(4,5,1,3,4,5)
+print(length(a))
+```
+
+To know the length of a list,tuple or dict we can use len()
+```{python cache=TRUE}
+# Python - Length of list , tuple etc
+# Length of a
+a=[4,5,1,3,4,5]
+print(len(a))
+# Length of b
+b = (4,5,7,8)
+print(len(b))
+
+```
+
+
+###4. Accessing help
+
+To access help in R we use the '?' or the 'help' function 
+```{r cache=TRUE}
+#R - Help - To be done in R console or RStudio
+#?sapply
+#help(sapply)
+```
+
+Help in python on any topic involves
+```{python cache=TRUE}
+#Python help - This can be done on a (I)Python console
+#help(len)
+#?len
+```
+
+###5. Subsetting
+The key difference between R and Python with regards to subsetting is that in R the index starts at 1. In Python it starts at 0, much like C,C++ or Java
+To subset a vector in R we use
+```{r cache=TRUE}
+#R - Subset
+a<-c(4,5,1,3,4,8,12,18,1)
+print(a[3])
+
+# To print a range or a slice. Print from the 3rd to the 5th element
+print(a[3:6])
+```
+
+Python also uses indices. The difference in Python is that the index starts from 0/
+```{python cache=TRUE}
+#Python - Subset
+a=[4,5,1,3,4,8,12,18,1]
+# Print the 4th element (starts from 0)
+print(a[3])
+
+# Print a slice from 4 to 6th element
+print(a[3:6])
+```
+
+###6. Operations on vectors in R and operation on lists in Python
+In R we can do many operations on vectors for e.g. element by element addition, subtraction,
+exponentation,product etc. as show
+```{r cache=TRUE}
+#R - Operations on vectors
+a<- c(5,2,3,1,7)
+b<- c(1,5,4,6,8)
+
+#Element wise Addition
+print(a+b)
+#Element wise subtraction
+print(a-b)
+#Element wise product
+print(a*b)
+# Exponentiating the elements of a vector
+print(a^2)
+```
+
+In Python to do this on lists we need to use the 'map' and the 'lambda' function as follows
+```{python }
+# Python - Operations on list
+a =[5,2,3,1,7]
+b =[1,5,4,6,8]
+
+#Element wise addition with map & lambda
+print(list(map(lambda x,y: x+y,a,b)))
+#Element wise subtraction
+print(list(map(lambda x,y: x-y,a,b)))
+#Element wise product
+print(list(map(lambda x,y: x*y,a,b)))
+# Exponentiating the elements of a list
+print(list(map(lambda x: x**2,a)))
+
+
+```
+
+However if we create ndarrays from lists then we can do the element wise addition,subtraction,product, etc. like R. Numpy is really a powerful module with many, many functions for matrix manipulations
+```{python cache=TRUE}
+import numpy as np
+a =[5,2,3,1,7]
+b =[1,5,4,6,8]
+a=np.array(a)
+b=np.array(b)
+#Element wise addition
+print(a+b)
+#Element wise subtraction
+print(a-b)
+#Element wise product
+print(a*b)
+# Exponentiating the elements of a list
+print(a**2)
+
+```
+
+###7. Getting the index of element
+To determine the index of an element which satisifies a specific logical condition in R use 'which'. In the code below the index of  element which is equal to 1 is 4
+```{r cache=TRUE}
+# R - Which
+a<- c(5,2,3,1,7)
+print(which(a == 1))
+```
+
+In Python array we can use np.where to get the same effect. The index will be 3 as the index starts from 0
+```{python cache=TRUE}
+# Python - np.where
+import numpy as np
+a =[5,2,3,1,7]
+a=np.array(a)
+print(np.where(a==1))
+```
+
+###8. Data frames
+R, by default comes with a set of in-built datasets. There are some datasets which come with the SkiKit- Learn package
+
+```{r cache=TRUE}
+# R 
+# To check built datasets use
+#data() - In R console or in R Studio
+#iris - Don't print to console
+
+```
+
+We can use the in-built data sets that come with Scikit package
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+# This creates a Sklearn bunch
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+```
+
+###9. Working with dataframes
+With R you can work with dataframes directly. For more complex dataframe operations in R there are convenient packages like dplyr, reshape2 etc. For Python we need to use the Pandas package. Pandas is quite comprehensive in the list of things we can do with data frames
+The most common operations on a dataframe are
+
+- Check the size of the dataframe
+- Take a look at the top 5 or bottom 5 rows of dataframe
+- Check the content of the dataframe
+
+####a.Size
+In R use dim()
+```{r cache=TRUE}
+#R - Size
+dim(iris)
+```
+For Python use .shape
+```{python cache=TRUE}
+#Python - size
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+iris.shape
+```
+
+####b. Top & bottom 5 rows of dataframe
+To know the top and bottom rows of a data frame we use head() & tail as shown below for R
+and Python
+```{r cache=TRUE}
+#R 
+head(iris,5)
+tail(iris,5)
+```
+
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+print(iris.head(5))
+print(iris.tail(5))
+```
+
+####c. Check the content of the dataframe
+```{r cache=TRUE}
+#R
+summary(iris)
+str(iris)
+```
+
+
+```{python}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+print(iris.info())
+```
+
+####d. Check column names
+```{r cache=TRUE}
+#R
+names(iris)
+colnames(iris)
+```
+
+
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+#Get column names
+print(iris.columns)
+```
+
+
+####e. Rename columns
+In R we can assign a vector to column names
+```{r cache=TRUE}
+#R
+colnames(iris) <- c("lengthOfSepal","widthOfSepal","lengthOfPetal","widthOfPetal","Species")
+colnames(iris)
+```
+
+In Python we can assign a list to <df>s.columns
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+iris.columns = ["lengthOfSepal","widthOfSepal","lengthOfPetal","widthOfPetal"]
+print(iris.columns)
+```
+
+
+###f.Details of dataframe
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+print(iris.info())
+```
+
+####g. Subsetting dataframes
+```{r cache=TRUE}
+# R
+#To subset a dataframe 'df' in R we use df[row,column] or df[row vector,column vector]
+#df[row,column]
+iris[3,4]
+#df[row vector, column vector]
+iris[2:5,1:3]
+#If we omit the row vector, then it implies all rows or if we omit the column vector
+# then implies all columns for that row
+iris[2:5,]
+# In R we can all specific columns by column names
+iris$Sepal.Length[2:5]
+```
+
+
+```{python cache=TRUE}
+#Python
+# To select an entire row we use .iloc. The index can be used with the ':'. If 
+# .iloc[start row: end row]. If start row is omitted then it implies the beginning of
+# data frame, if end row is omitted then it implies all rows till end
+#Python
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+print(iris.iloc[3])
+print(iris[:5])
+# In python we can select columns by column name as follows
+print(iris['sepal length (cm)'][2:6])
+#If you want to select more than 2 columns then you must use the double '[[]]' since the 
+# index is a list itself
+print(iris[['sepal length (cm)','sepal width (cm)']][4:7])
+```
+
+
+####h. Computing Mean, Standard deviation
+```{r cache=TRUE}
+#R 
+#Mean
+mean(iris$lengthOfSepal)
+#Standard deviation
+sd(iris$widthOfSepal)
+
+```
+
+```{python cache=TRUE}
+#Python
+#Mean
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+# Convert to Pandas dataframe
+print(iris['sepal length (cm)'].mean())
+#Standard deviation
+print(iris['sepal width (cm)'].std())
+```
+
+####i. Boxplot
+Boxplot can be produced in R using baseplot
+```{r cache=TRUE}
+#R
+boxplot(iris$lengthOfSepal)
+```
+
+Matplotlib is a popular package in Python for plots
+```{python cache=TRUE}
+#Python
+import sklearn as sklearn
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+import matplotlib.pyplot as plt
+img=plt.boxplot(iris['sepal length (cm)'])
+#plt.show(img)
+```
+
+####j. Scatter plot
+```{r cache=TRUE}
+#R
+plot(iris$widthOfSepal,iris$lengthOfSepal)
+```
+
+```{python cache=TRUE}
+#Python
+import matplotlib.pyplot as plt
+import sklearn as sklearn
+import pandas as pd
+from sklearn import datasets
+data = datasets.load_iris()
+# Convert to Pandas dataframe
+iris = pd.DataFrame(data.data, columns=data.feature_names)
+img=plt.scatter(iris['sepal width (cm)'],iris['sepal length (cm)'])
+#plt.show(img)
+```
+
+####k. Read from csv file
+```{r cache=TRUE}
+#R
+tendulkar= read.csv("tendulkar.csv",stringsAsFactors = FALSE,na.strings=c(NA,"-"))
+#Dimensions of dataframe
+dim(tendulkar)
+names(tendulkar)
+```
+
+Use pandas.read_csv() for Python
+```{python cache=TRUE}
+#Python
+import pandas as pd
+#Read csv
+tendulkar= pd.read_csv("tendulkar.csv",na_values=["-"])
+print(tendulkar.shape)
+print(tendulkar.columns)
+```
+
+####l. Clean the dataframe in R and Python. 
+The following steps are done for R and Python
+
+1.Remove rows with 'DNB'
+2.Remove rows with 'TDNB'
+3.Remove rows with absent
+4.Remove the "* indicating not out
+5.Remove incomplete rows with NA for R or NaN in Python
+6.Do a scatter plot
+
+
+```{r cache=TRUE}
+#R
+# Remove rows with 'DNB'
+a <- tendulkar$Runs != "DNB"
+tendulkar <- tendulkar[a,]
+dim(tendulkar)
+# Remove rows with 'TDNB'
+b <- tendulkar$Runs != "TDNB"
+tendulkar <- tendulkar[b,]
+
+# Remove rows with absent
+c <- tendulkar$Runs != "absent"
+tendulkar <- tendulkar[c,]
+dim(tendulkar)
+
+# Remove the "* indicating not out
+tendulkar$Runs <- as.numeric(gsub("\\*","",tendulkar$Runs))
+dim(tendulkar)
+# Select only complete rows - complete.cases()
+c <- complete.cases(tendulkar)
+#Subset the rows which are complete
+tendulkar <- tendulkar[c,]
+dim(tendulkar)
+# Do some base plotting - Scatter plot
+plot(tendulkar$BF,tendulkar$Runs)
+
+```
+
+
+```{python cache=TRUE}
+#Python 
+import pandas as pd
+import matplotlib.pyplot as plt
+#Read csv
+tendulkar= pd.read_csv("tendulkar.csv",na_values=["-"])
+print(tendulkar.shape)
+# Remove rows with 'DNB'
+a=tendulkar.Runs !="DNB"
+tendulkar=tendulkar[a]
+print(tendulkar.shape)
+# Remove rows with 'TDNB'
+b=tendulkar.Runs !="TDNB"
+tendulkar=tendulkar[b]
+print(tendulkar.shape)
+# Remove rows with absent
+c= tendulkar.Runs != "absent"
+tendulkar=tendulkar[c]
+print(tendulkar.shape)
+# Remove the "* indicating not out
+tendulkar.Runs= tendulkar.Runs.str.replace(r"[*]","")
+#Select only complete rows - dropna()
+tendulkar=tendulkar.dropna()
+print(tendulkar.shape)
+tendulkar.Runs = tendulkar.Runs.astype(int)
+tendulkar.BF = tendulkar.BF.astype(int)
+#Scatter plot
+plt.scatter(tendulkar.BF,tendulkar.Runs)
+```
+
+####m. Chaining operations on dataframes
+To chain a set of operations we need to use an R package like dplyr. Pandas does this 
+The following operations are done on tendulkar data frame by dplyr for R and Pandas for Python below
+
+1. Group by ground
+2. Compute average runs in each ground
+3. Arrange in descending order
+
+```{r cache=TRUE}
+#R
+library(dplyr)
+tendulkar1 <- tendulkar %>% group_by(Ground) %>% summarise(meanRuns= mean(Runs)) %>%
+         arrange(desc(meanRuns))
+head(tendulkar1,10)
+```
+
+```{python }
+#Python
+import pandas as pd
+#Read csv
+tendulkar= pd.read_csv("tendulkar.csv",na_values=["-"])
+print(tendulkar.shape)
+# Remove rows with 'DNB'
+a=tendulkar.Runs !="DNB"
+tendulkar=tendulkar[a]
+# Remove rows with 'TDNB'
+b=tendulkar.Runs !="TDNB"
+tendulkar=tendulkar[b]
+# Remove rows with absent
+c= tendulkar.Runs != "absent"
+tendulkar=tendulkar[c]
+# Remove the "* indicating not out
+tendulkar.Runs= tendulkar.Runs.str.replace(r"[*]","")
+
+#Select only complete rows - dropna()
+tendulkar=tendulkar.dropna()
+tendulkar.Runs = tendulkar.Runs.astype(int)
+tendulkar.BF = tendulkar.BF.astype(int)
+tendulkar1= tendulkar.groupby('Ground').mean()['Runs'].sort_values(ascending=False)
+print(tendulkar1.head(10))
+```
+
+###9. Functions
+```{r}
+product <- function(a,b){
+  c<- a*b
+  c
+}
+product(5,7)
+```
+
+```{python}
+def product(a,b):
+  c = a*b
+  return c
+  
+print(product(5,7))
+
+
+```
+
+## Conclusion
+Personally, I took to R, much like a 'duck takes to water'. I found the R syntax very simple and mostly intuitive. R packages like dplyr, ggplot2, reshape2, make the language quite irrestible. R is weakly typed and has only numeric and character types as opposed to the full fledged data types in Python. 
+
+Python, has too many bells and whistles, which can be a little bewildering to the novice. It is possible that they may be useful as one becomes more experienced with the language. Also I found that installing Python packages sometimes gives errors with Python versions 2.7 or 3.6. This will leave you scrambling to google to find how to fix these problems. These can be quite frustrating. R on the other hand makes installing R packages a breeze.
+
+Anyway, this is my current opinion, and like all opinions, may change in the course of time. Let's see!
+
+I may write a follow up post with more advanced features of R and Python. So do keep checking!
+Long live R! Viva la Python!

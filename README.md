@@ -15,3 +15,17 @@ in one of the language can further their knowledge on the other. Those are famil
 equivalent implements useful to internalize the algorithms. This book should serve as a useful and handy reference for 
 Machine Learning algorithms in both R and Python
 
+Table of Contents
+Preface 4
+1.	Essential R ………………………………………………………………….  7
+2.	Essential Python for Datascience  …………………………………………  54
+3.	R vs Python ………………………………………………………………... 77
+4.	Regression of a continuous variable ………………………………………... 96
+5.	Classification and Cross Validation  ………………………………………..113
+6.	Regression techniques and regularization  ………………………………… 134
+7.	SVMs, Decision Trees and Validation curves  ……………………………... 175
+8.	Splines, GAMs, Random Forests and Boosting …………………………… 202
+9.	PCA, K-Means and Hierarchical Clustering ……………………………….. 234
+References ……………………………………………………………………… 244
+
+

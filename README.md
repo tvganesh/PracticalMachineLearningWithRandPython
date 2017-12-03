@@ -1,6 +1,9 @@
 # PracticalMachineLearningWithRandPython
 ## Machine Learning in Stereo
 
+This book is now available on Amazon in Paperback and Kindle versions
+- [Practical machine Learning with Python- Machine Learning in Stereo](https://www.amazon.co.uk/dp/1973443503)
+- [Practical machine Learning with Python- Machine Learning in Stereo](https://www.amazon.in/dp/B077WFS87Z)
 This book implements many common Machine Learning algorithms in equivalent R and Python. The book touches on R and 
 Python implementations of different regression models, classification algorithms including logistic regression, 
 KNN classification, SVMs, b-splines, random forest, boosting etc. Other techniques like best-fit, forward fit, 
@@ -17,15 +20,15 @@ Machine Learning algorithms in both R and Python
 
 Table of Contents
 Preface 4
-1.	Essential R ………………………………………………………………….  7
-2.	Essential Python for Datascience  …………………………………………  54
-3.	R vs Python ………………………………………………………………... 77
-4.	Regression of a continuous variable ………………………………………... 96
-5.	Classification and Cross Validation  ………………………………………..113
-6.	Regression techniques and regularization  ………………………………… 134
-7.	SVMs, Decision Trees and Validation curves  ……………………………... 175
-8.	Splines, GAMs, Random Forests and Boosting …………………………… 202
-9.	PCA, K-Means and Hierarchical Clustering ……………………………….. 234
-References ……………………………………………………………………… 244
+1.	Essential R ___________________________________________________  7
+2.	Essential Python for Datascience  ____________________________  54
+3.	R vs Python ____________________________________________________77
+4.	Regression of a continuous variable ___________________________ 96
+5.	Classification and Cross Validation  __________________________113
+6.	Regression techniques and regularization ______________________134
+7.	SVMs, Decision Trees and Validation curves ___________________ 175
+8.	Splines, GAMs, Random Forests and Boosting ___________________ 202
+9.	PCA, K-Means and Hierarchical Clustering _____________________ 234
+References _______________________________________________________ 244
 
 
